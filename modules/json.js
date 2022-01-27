@@ -20,7 +20,7 @@ export function readStream(stream, options) {
 	);
 
 	return emitter;
-};
+}
 
 
 /**
@@ -29,7 +29,7 @@ export function readStream(stream, options) {
 * @param {string} [options.lineSuffix='\n'] Optional line suffix for each output line of JSON
 */
 export function writeStream(stream, options) {
-	var settings = {
+	let settings = {
 		lineSuffix: '\n',
 		...options,
 	};
@@ -54,4 +54,4 @@ export function writeStream(stream, options) {
 			);
 		},
 	};
-};
+}
