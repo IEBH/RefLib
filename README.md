@@ -8,6 +8,21 @@ This library provides various read/write functionality to process citation libra
 **Please use [Version 1](https://github.com/hash-bang/Reflib-Node) ([NPM](https://www.npmjs.com/package/reflib)) until this message is removed**
 
 
+Compatibility
+=============
+
+| Library                | Extension(s) | Read               | Write              |
+|------------------------|--------------|--------------------|--------------------|
+| Comma Seperated Values | `.csv`       | :x:                | :x:                |
+| EndNote ENL            | `.enl`       | :x:                | :x:                |
+| EndNote ENLX           | `.enlx`      | :x:                | :x:                |
+| EndNote XML            | `.xml`       | :white_check_mark: | :white_check_mark: |
+| JSON                   | `.json`      | :white_check_mark: | :white_check_mark: |
+| Medline                | `.nbib`      | :x:                | :x:                |
+| RIS                    | `.ris`       | :x:                | :x:                |
+| Tab Seperated Values   | `.tsv`       | :x:                | :x:                |
+
+
 
 API
 ===
