@@ -64,6 +64,8 @@ describe('Module: JSON', ()=> {
 		return new Promise((resolve, reject) => {
 			let output = reflib.writeStream('json', createWriteStream(tempPath));
 
+			output.start();
+
 			reflib.readStream('json', createReadStream(`${__dirname}/data/blue-light.json`))
 				.on('ref', ref => output.write(ref))
 				.on('end', ()=> output.end().then(resolve))
