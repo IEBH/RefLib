@@ -10,7 +10,7 @@ API
 Each API is available either from the default `reflib` object or as a separate import.
 
 
-```
+```javascript
 import reflib from 'reflib'; // Import everything as `reflib`
 reflib.readFile(path);
 reflib.writeFile(path, refs);
@@ -48,7 +48,7 @@ identifyFormat('My Refs.nbib') //= nbib
 identifyFormat('My Refs.txt.ris') //= ris
 identifyFormat('MY REFS.TXT.RIS') //= ris
 identifyFormat('My Refs.data.tsv') //= tsv
-identifyFormat('My Refs.xml') //=endnoteXml
+identifyFormat('My Refs.xml') //= endnoteXml
 ```
 
 
@@ -58,7 +58,7 @@ Read a file on disk, returning a Promise which will resolve with an array of all
 
 ```javascript
 reflib.readFile('./data/json/json1.json')
-	.then(refs => /* Do something with array of Refs */)
+	.then(refs => /* Do something with Ref collection */)
 ```
 
 
@@ -86,13 +86,15 @@ reflib.writeFile('MyRefs.xml', refs);
 writeStream(moduleId, outputStream, options)
 ============================================
 Return an object with methods to call to write to a given stream.
-The returned object will have a `start()`, `end()` and `write(ref)` function which can be called too write to the original input stream.
+The returned object will have a `start()`, `end()` and `write(ref)` function which can be called to write to the original input stream.
 
 ```javascript
 // Convert a JSON file to EndNoteXML via a stream
 let output = reflib.writeStream('json', createWriteStream('./MyRefs.xml'));
 
+output.start(); // Begin stream writing
+
 reflib.readStream('json', createReadStream('./data/json/json1.json'))
 	.on('ref', ref => output.write(ref))
-	.on('end', output.end)
+	.on('end', ()=> output.end())
 ```
