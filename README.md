@@ -4,6 +4,10 @@ Reference library processing for Node.
 
 This library provides various read/write functionality to process citation libraries and handle individual references (henceforth "Refs").
 
+**NOTE: THIS LIBRARY IS STILL UNDER CONSTRUCTION**
+**Please use [Version 1](https://github.com/hash-bang/Reflib-Node) ([NPM](https://www.npmjs.com/package/reflib)) until this message is removed**
+
+
 
 API
 ===
