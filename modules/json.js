@@ -4,7 +4,7 @@ import bfjc from 'bfj-collections';
 /**
 * @see modules/interface.js
 */
-export function readStream(stream, options) {
+export function readStream(stream) {
 	let recNumber = 1;
 	let emitter = Emitter();
 

@@ -6,4 +6,4 @@ import EventEmitter from 'node:events';
 */
 export default function emitter() {
 	return new EventEmitter;
-};
+}

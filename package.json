@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "Reference / Citation reference library utilities",
   "scripts": {
+    "lint": "eslint lib modules shared test",
     "test": "mocha"
   },
   "repository": {

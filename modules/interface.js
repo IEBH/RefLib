@@ -2,6 +2,7 @@
 * Generic module interface
 * This file serves no purpose other than to document the methods that each module can itself expose
 */
+/* eslint-disable no-unused-vars */
 
 
 /**
@@ -16,7 +17,7 @@
 */
 export function readStream(stream, options) {
 	// Stub
-};
+}
 
 
 /**
@@ -32,4 +33,4 @@ export function readStream(stream, options) {
 */
 export function writeStream(stream, refs, options) {
 	// Stub
-};
+}

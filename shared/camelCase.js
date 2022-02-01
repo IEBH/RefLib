@@ -7,10 +7,10 @@
 */
 export default function(input) {
 	return input
-		.split(/[\s\-]/)
+		.split(/[\s-]/)
 		.map((word, offset) => offset == 0
 			? word.toLowerCase()
 			: word.substr(0, 1).toUpperCase() + word.substr(1).toLowerCase()
 		)
 		.join('')
-};
+}

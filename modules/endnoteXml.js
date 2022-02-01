@@ -6,7 +6,7 @@ import {createParser as XMLParser} from 'node-expat';
 /**
 * @see modules/interface.js
 */
-export function readStream(stream, options) {
+export function readStream(stream) {
 	let emitter = Emitter();
 
 	/**
@@ -182,7 +182,7 @@ export function writeStream(stream, options) {
 						['custom6', 'custom6'],
 						['custom7', 'custom7'],
 					]
-						.filter(([rlKey, rawKey]) => ref[rlKey]) // Remove empty fields
+						.filter(([rlKey]) => ref[rlKey]) // Remove empty fields
 						.map(([rlKey, rawKey]) =>
 							`<${rawKey}><style face="normal" font="default" size="100%">${xmlEscape(ref[rlKey])}</style></${rawKey}>`
 						)
