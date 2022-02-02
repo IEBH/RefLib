@@ -11,16 +11,16 @@ This library provides various read/write functionality to process citation libra
 Compatibility
 =============
 
-| Library                | Extension(s) | Read               | Write              |
-|------------------------|--------------|--------------------|--------------------|
-| Comma Seperated Values | `.csv`       | :x:                | :x:                |
-| EndNote ENL            | `.enl`       | :x:                | :x:                |
-| EndNote ENLX           | `.enlx`      | :x:                | :x:                |
-| EndNote XML            | `.xml`       | :white_check_mark: | :white_check_mark: |
-| JSON                   | `.json`      | :white_check_mark: | :white_check_mark: |
-| Medline                | `.nbib`      | :x:                | :x:                |
-| RIS                    | `.ris`       | :x:                | :x:                |
-| Tab Seperated Values   | `.tsv`       | :x:                | :x:                |
+| Library                | Extension(s)    | Read               | Write              |
+|------------------------|-----------------|--------------------|--------------------|
+| Comma Seperated Values | `.csv`          | :x:                | :x:                |
+| EndNote ENL            | `.enl`          | :x:                | :x:                |
+| EndNote ENLX           | `.enlx`         | :x:                | :x:                |
+| EndNote XML            | `.xml`          | :white_check_mark: | :white_check_mark: |
+| JSON                   | `.json`         | :white_check_mark: | :white_check_mark: |
+| Medline                | `.nbib`         | :x:                | :x:                |
+| RIS                    | `.ris` / `.txt` | :x:                | :x:                |
+| Tab Seperated Values   | `.tsv`          | :x:                | :x:                |
 
 
 
