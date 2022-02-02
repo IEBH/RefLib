@@ -121,7 +121,7 @@ export function writeStream(stream, options) {
 			return Promise.resolve();
 		},
 		write: ref => {
-			let refType = translations.types.rl2raw[ref.type || settings.defaultType];
+			let refType = translations.types.rlMap.get(ref.type || settings.defaultType);
 			if (!refType) throw new Error(`Invalid reference type: "${ref.type}"`);
 
 			refsSeen++;
@@ -247,7 +247,7 @@ export function translateRawToRef(xRef) {
 				.filter(field => xRef[field.raw]) // Only include fields we have a value for
 				.map(field => [ field.rl, xRef[field.raw] ]) // Translate Raw -> Reflib spec
 		),
-		type: translations.types.raw2rl[xRef.refType]?.rl || 'report',
+		type: translations.types.rawMap.get(+xRef.refType || 17)?.rl,
 	};
 
 	return recOut;
@@ -308,7 +308,6 @@ export let translations = {
 			{rl: 'keywords', raw: 'keywords'},
 			{rl: 'urls', raw: 'urls'},
 		],
-		rl2Raw: {},
 	},
 	// }}}
 	// Ref type translations {{{
@@ -363,18 +362,14 @@ export let translations = {
 			{rl: 'unpublished', rawText: 'Unpublished Work', rawId: 34},
 			{rl: 'web', rawText: 'Web Page', rawId: 12},
 		],
+		rlMap: new Map(), // Calculated later for quicker lookup
+		rawMap: new Map(), // Calculated later for quicker lookup
 	},
 	// }}}
 };
 
-// Compute various translations.*.{rl2raw,raw2rl} values {{{
-// Create lookup object of translations.fields with key as .rl / val as the full object
-translations.types.rl2raw = Object.fromEntries(
-	translations.types.collection.map(c => [c.rl, c])
-);
-
-// Create lookup object of translations.fields with key as .rawId / val as the full object
-translations.types.raw2rl = Object.fromEntries(
-	translations.types.collection.map(c => [c.rawId, c])
-);
-// }}}
+// Create lookup object of translations.types with key as .rl / val as the full object
+translations.types.collection.forEach(c => {
+	translations.types.rlMap.set(c.rl, c);
+	translations.types.rawMap.set(c.rawId, c);
+});
