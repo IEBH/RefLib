@@ -34,3 +34,12 @@ export function readStream(stream, options) {
 export function writeStream(stream, refs, options) {
 	// Stub
 }
+
+
+/**
+* Function to run to set up any additional data before the module is needed
+* This is generally used by worker functions which construct maps from collections for efficiency purposes
+*/
+export function setup() {
+	// Stub
+}

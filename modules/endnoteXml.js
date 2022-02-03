@@ -368,8 +368,14 @@ export let translations = {
 	// }}}
 };
 
-// Create lookup object of translations.types with key as .rl / val as the full object
-translations.types.collection.forEach(c => {
-	translations.types.rlMap.set(c.rl, c);
-	translations.types.rawMap.set(c.rawId, c);
-});
+
+/**
+* @see modules/interface.js
+*/
+export function setup() {
+	// Create lookup object of translations.types with key as .rl / val as the full object
+	translations.types.collection.forEach(c => {
+		translations.types.rlMap.set(c.rl, c);
+		translations.types.rawMap.set(c.rawId, c);
+	});
+}

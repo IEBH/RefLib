@@ -237,4 +237,4 @@ TODO
 - [ ] "progress" emitter for files
 - [ ] `.fromFile()` browser compatibility
 - [ ] `.toFile()` browser compatibility
-- [ ] `setup()` functions per module to avoid things like map calculations unless the module is actually needed
+- [x] `setup()` functions per module to avoid things like map calculations unless the module is actually needed
