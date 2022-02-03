@@ -104,7 +104,7 @@ export function readStream(stream) {
 */
 export function writeStream(stream, options) {
 	let settings = {
-		defaultType: 'report',
+		defaultType: 'journalArticle',
 		filePath: 'c:\\',
 		fileName: 'EndNote.enl',
 		formatDate: value => value instanceof Date ? value.toISOString().substr(0, 10) : value,

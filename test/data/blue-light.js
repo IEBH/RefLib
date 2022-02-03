@@ -53,7 +53,24 @@ export let testRefs = [
 ]
 
 
-export function compareTestRefs(refs) {
+/**
+* Compare the incoming ref collection against the data that we know is valid
+* "Valid" data is specified in `testRefs` above and should be considered pristine data
+* @param {array<object>} refs Collection of input refs to compare against the known-correct data-set
+* @param {Object} [options] Additional options to use when comparing
+* @param {array<string>} Keys to exclude when comparing ref-to-ref
+* @param {string} [options.profile] Meta profile to set other options, see function for definitions
+*/
+export function compareTestRefs(refs, options) {
+	// Argument mangling {{{
+	let settings = {
+		excludeKeys: [],
+		...options,
+	};
+	if (settings.profile == 'ris') Object.assign(settings, {excludeKeys: ['recNumber']});
+	settings.excludeKeys = new Set(settings.excludeKeys); // Cast `excludeKeys` into a faster Set lookup
+	// }}}
+
 	expect(refs).to.be.an('array');
 	expect(refs).to.have.length(102);
 
@@ -62,6 +79,7 @@ export function compareTestRefs(refs) {
 
 		expect(computedRef).to.be.an('object');
 		Object.entries(originalRef).forEach(([key, val]) => {
+			if (settings.excludeKeys.has(key)) return; // Ignore key if excluded
 			expect(computedRef).to.have.property(key);
 			expect(computedRef[key]).to.deep.equal(val);
 		});
