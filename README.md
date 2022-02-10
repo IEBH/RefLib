@@ -157,6 +157,8 @@ Properties are:
 | `title`      | `String`        | Longer, human readable title of the module                             |
 | `titleShort` | `String`        | Shorter, human readable title of the module                            |
 | `ext`        | `Array<String>` | Array of output file extensions, first extension should be the default |
+| `canRead`    | `boolean`       | Whether the format is supported when reading a citation library        |
+| `canWrite`   | `boolean`       | Whether the format is supported when writing a citation library        |
 
 
 identifyFormat(path)
