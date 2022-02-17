@@ -44,8 +44,8 @@
   "dependencies": {
     "bfj": "^7.0.2",
     "bfj-collections": "^1.0.5",
+    "htmlparser2": "^7.2.0",
     "mitt": "^3.0.0",
-    "node-expat": "^2.4.0",
     "vite-plugin-replace": "^0.1.1"
   }
 }

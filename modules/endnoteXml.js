@@ -1,6 +1,6 @@
 import camelCase from '../shared/camelCase.js';
 import Emitter from '../shared/emitter.js';
-import {createParser as XMLParser} from 'node-expat';
+import {WritableStream as XMLParser} from 'htmlparser2/lib/WritableStream.js';
 
 
 /**
@@ -33,62 +33,72 @@ export function readStream(stream) {
 
 	// Queue up the parser in the next tick (so we can return the emitter first)
 	setTimeout(()=> {
-		let parser = new XMLParser()
-			.on('startElement', (name, attrs) => {
+		let parser = new XMLParser({
+			xmlMode: true,
+			decodeEntities: false, // Handled below
+			onopentag(name, attrs) {
 				textAppend = false;
 				stack.push({
 					name: camelCase(name),
 					attrs,
 				});
-			})
-			.on('endElement', name => {
+			},
+			onclosetag(name) {
 				if (name == 'record') {
+					if (ref.title) ref.title = ref.title // htmlparser2 handles the '<title>' tag in a really bizare way so we have to pull apart the <style> bits when parsing
+						.replace(/^.*<style.*>(.*)<\/style>.*$/m, '$1')
+						.replace(/^\s+/, '')
+						.replace(/\s+$/, '')
 					emitter.emit('ref', translateRawToRef(ref));
 					stack = []; // Trash entire stack when hitting end of <record/> node
 					ref = {}; // Reset the ref state
 				} else {
 					stack.pop();
 				}
-			})
-			.on('text', text => {
+			},
+			ontext(text) {
 				let parentName = stack[stack.length - 1]?.name;
 				let gParentName = stack[stack.length - 2]?.name;
-				if (parentName == 'style' && gParentName == 'author') {
+				if (parentName == 'title') {
+					if (textAppend) {
+						ref.title += text;
+					} else {
+						ref.title = text;
+					}
+				} else if (parentName == 'style' && gParentName == 'author') {
 					if (!ref.authors) ref.authors = [];
 					if (textAppend) {
-						ref.authors[ref.authors.length - 1] += text;
+						ref.authors[ref.authors.length - 1] += xmlUnescape(text);
 					} else {
-						ref.authors.push(text);
+						ref.authors.push(xmlUnescape(text));
 					}
 				} else if (parentName == 'style' && gParentName == 'keyword') {
 					if (!ref.keywords) ref.keywords = [];
 					if (textAppend) {
-						ref.keywords[ref.keywords.length - 1] += text;
+						ref.keywords[ref.keywords.length - 1] += xmlUnescape(text);
 					} else {
-						ref.keywords.push(text);
+						ref.keywords.push(xmlUnescape(text));
 					}
 				} else if (parentName == 'style') { // Text within <style/> tag
 					if (textAppend || ref[gParentName]) { // Text already exists? Append (handles node-expats silly multi-text per escape character "feature")
-						ref[gParentName] += text;
+						ref[gParentName] += xmlUnescape(text);
 					} else {
-						ref[gParentName] = text;
+						ref[gParentName] = xmlUnescape(text);
 					}
 				} else if (['recNumber', 'refType'].includes(parentName)) { // Simple setters like <rec-number/>
 					if (textAppend || ref[parentName]) {
-						ref[parentName] += text;
+						ref[parentName] += xmlUnescape(text);
 					} else {
-						ref[parentName] = text;
+						ref[parentName] = xmlUnescape(text);
 					}
-				} else {
-					// console.log('ORPHANED TEXT', stack, text);
 				}
 				textAppend = true; // Always set the next call to the text emitter handler as an append operation
-			})
-			.on('error', e => emitter.emit('error', e))
+			},
+		})
 
 		stream.pipe(parser)
-			.on('end', ()=> emitter.emit('end'))
-	})
+			.on('finish', ()=> emitter.emit('end'))
+	});
 
 	return emitter;
 }
@@ -262,11 +272,27 @@ export function translateRawToRef(xRef) {
 export function xmlEscape(str) {
 	return ('' + str)
 		.replace(/&/g, '&amp;')
-		.replace(/\r/g, '&#13;')
+		.replace(/\r/g, '&#xD;')
 		.replace(/</g, '&lt;')
 		.replace(/>/g, '&gt;')
 		.replace(/"/g, '&quot;')
 		.replace(/'/g, '&apos;');
+}
+
+
+/**
+* Default XML -> string decodeer
+* @param {string} str The input string to decode
+* @returns {string} The actual string
+*/
+export function xmlUnescape(str) {
+	return ('' + str)
+		.replace(/\&amp;/g, '&')
+		.replace(/\&#xD;/g, '\r')
+		.replace(/\&lt;/g, '<')
+		.replace(/\&gt;/g, '>')
+		.replace(/\&quot;/g, '"')
+		.replace(/\&apos;/g, "'");
 }
 
 
