@@ -107,7 +107,7 @@ export function readStream(stream) {
 /**
 * @see modules/interface.js
 * @param {Object} [options] Additional options to use when parsing
-* @param {string} [options.defaultType='report'] Default citation type to assume when no other type is specified
+* @param {string} [options.defaultType='journalArticle'] Default citation type to assume when no other type is specified
 * @param {string} [options.filePath="c:\\"] "Fake" internal source file path the citation lirary was exported from, must end with backslashes
 * @param {string} [options.fileName="EndNote.enl"] "Fake" internal source file name the citation lirary was exported from
 * @param {function} [options.formatDate] Date formatter to translate between a JS Date object and the EndNote YYYY-MM-DD format
