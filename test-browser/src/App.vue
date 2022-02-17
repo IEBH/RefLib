@@ -8,5 +8,7 @@ import reflibTest from './components/reflibTest.vue'
 
 <style>
 @import "bootstrap/dist/css/bootstrap.css";
+
 @import "@fortawesome/fontawesome-free/css/fontawesome.css";
+@import "@fortawesome/fontawesome-free/css/solid.css";
 </style>

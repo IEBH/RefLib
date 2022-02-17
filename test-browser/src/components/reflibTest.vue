@@ -11,20 +11,16 @@ export default {
 	}},
 	methods: {
 		fileImport() {
-			let vm = this;
 			reflib.uploadFile({
-				onStart() {
+				onStart: ()=> {
 					this.mode = 'processing';
-					new Promise(resolve => {
-						console.log('WAIT!');
-						setTimeout(resolve, 1000);
-					});
+					return this.$nextTick(); // Wait for Vue to redraw
 				},
-				onProgress(current, max) {
-					this.progressCurrent = current;
+				onProgress: (current, max) => {
+					vm.progressCurrent = current;
 					this.progressMax = max;
 				},
-				onEnd() {
+				onEnd: ()=> {
 					this.mode = 'done';
 				},
 			})
@@ -67,13 +63,13 @@ export default {
 		</div>
 	</header>
 
-	<!-- Processing marker {{{ -->
+	<!-- Processing marker -->
 	<section v-if="mode == 'processing'" class="mt-4">
 		<div class="container px-4">
 			<div class="row gx-4 justify-content-center">
-				<div class="col-lg-8">
+				<div class="col-lg-8 text-center my-2">
 					<h1>
-						<i class="fa-solid fa-spinner-third fa-spin"/>
+						<i class="fas fa-spinner fa-spin"/>
 						Loading citations...
 					</h1>
 					<div v-if="progressMax > 0" class="mt-1">
