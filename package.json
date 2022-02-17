@@ -28,7 +28,10 @@
   },
   "type": "module",
   "exports": {
-    ".": "./lib/default.js",
+    ".": {
+      "browser": "./lib/browser.js",
+      "default": "./lib/default.js"
+    },
     "./*": "./lib/*.js"
   },
   "devDependencies": {
@@ -42,6 +45,7 @@
     "bfj": "^7.0.2",
     "bfj-collections": "^1.0.5",
     "mitt": "^3.0.0",
-    "node-expat": "^2.4.0"
+    "node-expat": "^2.4.0",
+    "vite-plugin-replace": "^0.1.1"
   }
 }

@@ -146,6 +146,7 @@ writeFile(path, refs);
 
 formats
 =======
+Available: Node + Browser
 A lookup object of all supported citation library formats.
 Each key is the unique ID of that module.
 
@@ -163,6 +164,7 @@ Properties are:
 
 identifyFormat(path)
 ====================
+Available: Node + Browser
 Attempt to determine the format of a file on disk from its path. The file does not need to actually exist.
 
 ```javascript
@@ -178,6 +180,7 @@ identifyFormat('My Refs.xml') //= endnoteXml
 
 readFile(path, options)
 =======================
+Available: Node
 Read a file on disk, returning a Promise which will resolve with an array of all Refs extracted.
 
 ```javascript
@@ -185,9 +188,25 @@ reflib.readFile('./data/json/json1.json')
 	.then(refs => /* Do something with Ref collection */)
 ```
 
+uploadFile(options)
+===================
+Available: Browser
+Prompt the user for a file and process it into an array of citations.
+
+```javascript
+reflib.uploadFile({ // Additional options
+	file, // Optional File object if known, if omitted this function will prompt the user to select a file
+	onStart, // Async function called as `(File)` when starting the read stage
+	onProgress, // Function called as `(position, totalSize)` when processing the file
+	onEnd, // Async function called as `()` when the read stage has completed
+})
+	.then(refs => /* Do something with Ref collection */)
+```
+
 
 writeFile(path, refs, options)
 ==============================
+Available: Node
 Write a file back to disk, returning a Promise which will resolve when done.
 
 ```javascript
@@ -198,6 +217,7 @@ reflib.writeFile('MyRefs.xml', refs);
 
 readStream(moduleId, inputStream, options)
 ==========================================
+Available: Node + Browser
 Low level worker of `readFile()`.
 Accept an input Stream.Readable and return a emitter which will emit each Ref found.
 
@@ -211,6 +231,7 @@ reflib.readStream('json', createReadStream('./data/json/json1.json'))
 
 writeStream(moduleId, outputStream, options)
 ============================================
+Available: Node + Browser
 Low level worker of `writeFile()`.
 Return an object with methods to call to write to a given stream.
 The returned object will have a `start()`, `end()` and `write(ref)` function which can be called to write to the original input stream.
