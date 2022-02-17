@@ -258,6 +258,6 @@ TODO
 ====
 - [x] Basic parsing iterfaces
 - [ ] "progress" emitter for files
-- [ ] `.fromFile()` browser compatibility
-- [ ] `.toFile()` browser compatibility
+- [x] `.uploadFile()` browser compatibility
+- [ ] `.downloadFile()` browser compatibility
 - [x] `setup()` functions per module to avoid things like map calculations unless the module is actually needed
