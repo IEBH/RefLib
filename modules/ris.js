@@ -28,12 +28,11 @@ export function readStream(stream, options) {
 
 				let bufferSegment;
 				while (bufferSegment = bufferSplitter.exec(buffer)) {
-					let bufferEnd = bufferSegment.index + bufferSegment[0].length; // Calculate start of string offset this reference begins at
-					let parsedRef = parseRef(buffer.substring(bufferCrop, bufferEnd), settings); // Parse the ref from the start+end points
+					let parsedRef = parseRef(buffer.substring(bufferCrop, bufferSegment.index), settings); // Parse the ref from the start+end points
 
 					emitter.emit('ref', parsedRef);
 
-					bufferCrop = bufferEnd; // Set start of next ref + cropping index to last seen offset + match
+					bufferCrop = bufferSegment.index + bufferSegment[0].length; // Set start of next ref + cropping index to last seen offset + match
 				}
 
 				buffer = buffer.substring(bufferCrop); // Shift-truncate the buffer so we're ready to input more data on the next call
@@ -56,10 +55,60 @@ export function readStream(stream, options) {
 
 /**
 * @see modules/interface.js
+* @param {Object} [options] Additional options to use when parsing
+* @param {string} [options.defaultType='journalArticle'] Default citation type to assume when no other type is specified
+* @param {string} [options.delimeter='\r'] How to split multi-line items
 */
 export function writeStream(stream, options) {
 	let settings = {
+		defaultType: 'journalArticle',
+		delimeter: '\r',
 		...options,
+	};
+
+
+	return {
+		start() {
+			return Promise.resolve();
+		},
+		write: xRef => {
+			let ref = { // Assign defaults if not already present
+				type: settings.defaultType,
+				title: '<NO TITLE>',
+				...xRef,
+			};
+
+			// Parse `pages` back into `_pageStart` + `_pageEnd` meta keys
+			if (xRef.pages) {
+				var pageRanges = /^(?<_pageStart>.+?)(-(?<_pageEnd>.+))?$/.exec(xRef.pages)?.groups;
+				Object.assign(ref, pageRanges);
+				delete ref.pages;
+			}
+
+			let a ;
+			stream.write(
+				a = translations.fields.collectionOutput
+					.filter(f => ref[f.rl]) // Has field?
+					.flatMap(f =>
+						f.rl == 'type' // Translate type field
+							? 'TY  - ' + (translations.types.rlMap[ref.type] || 'JOUR')
+						: f.outputRepeat && Array.isArray(ref[f.rl]) // Repeat array types
+							? ref[f.rl].map(item => `${f.raw}  - ${item}`)
+						: Array.isArray(ref[f.rl]) // Flatten arrays into text
+							? `${f.raw}  - ${ref[f.rl].join(settings.delimeter)}`
+						: `${f.raw}  - ${ref[f.rl]}` // Regular field output
+					)
+					.concat(['ER  - \n\n'])
+					.join('\n')
+			);
+
+			return Promise.resolve();
+		},
+		end() {
+			return new Promise((resolve, reject) =>
+				stream.end(err => err ? reject(err) : resolve())
+			);
+		},
 	};
 }
 
@@ -77,10 +126,10 @@ export function parseRef(refString, settings) {
 	refString
 		.split(/[\r\n|\n]/) // Split into lines
 		.forEach(line => {
-			let parsedLine = /^\s*(?<key>.+?)\s+-\s+(?<value>.*)$/.exec(line)?.groups;
+			let parsedLine = /^\s*(?<key>[A-Z0-9]+?)\s+-\s+(?<value>.*)$/s.exec(line)?.groups;
 			if (!parsedLine) { // Doesn't match key=val spec
 				if (line.replace(/\s+/, '') && lastField) { // Line isn't just whitespace + We have a field to append to - append with \r delimiters
-					if (lastField.isArray) { // Treat each line feed like an array entry
+					if (lastField.inputArray) { // Treat each line feed like an array entry
 						ref[lastField.rl].push(line);
 					} else { // Assume we append each line entry as a string with settings.delimeter
 						ref[lastField.rl] += settings.delimeter + line;
@@ -98,7 +147,7 @@ export function parseRef(refString, settings) {
 			} else if (fieldLookup.rl == 'type') { // Special handling for ref types
 				ref[fieldLookup.rl] = translations.types.rawMap.get(parsedLine.value)?.rl || settings.defaultType;
 				lastField = fieldLookup; // Track last key so we can append to it on the next cycle
-			} else if (fieldLookup.isArray) { // Should this `rl` key be treated like an appendable array?
+			} else if (fieldLookup.inputArray) { // Should this `rl` key be treated like an appendable array?
 				if (!ref[fieldLookup.rl]) { // Array doesn't exist yet
 					ref[fieldLookup.rl] = [parsedLine.value];
 				} else {
@@ -132,19 +181,22 @@ export function parseRef(refString, settings) {
 * @property {array<Object>} fields Field translations between RefLib (`rl`) and the raw format (`raw`)
 * @property {array<Object>} types Field translations between RefLib (`rl`) and the raw format types as raw text (`rawText`) and numeric ID (`rawId`)
 * @property {boolean} isArray Whether the field should append to any existing `rl` field and be treated like an array of data
+* @property {number|boolean} [sort] Sort order when outputting, use boolean `false` to disable the field on output
+* @property {boolean} [outputRepeat=false] Whether to repeat the output field if multiple values are present, if disabled arrays are flattened into a string with newlines instead
+* @property {boolean} [inputArray=false] Forcably cast the field as an array when reading, even if there is only one value
 */
 export let translations = {
 	// Field translations {{{
 	fields: {
 		collection: [
-			{rl: 'authors', raw: 'A1', isArray: true},
-			{rl: 'authors', raw: 'A2', isArray: true},
-			{rl: 'authors', raw: 'A3', isArray: true},
-			{rl: 'authors', raw: 'A4', isArray: true},
+			{rl: 'authors', raw: 'A1', sort: false, inputArray: true},
+			{rl: 'authors', raw: 'A2', sort: false, inputArray: true},
+			{rl: 'authors', raw: 'A3', sort: false, inputArray: true},
+			{rl: 'authors', raw: 'A4', sort: false, inputArray: true},
 			{rl: 'abstract', raw: 'AB'},
 			{rl: 'address', raw: 'AD'},
 			{rl: 'accession', raw: 'AN'},
-			{rl: 'authors', raw: 'AU', isArray: true},
+			{rl: 'authors', raw: 'AU', sort: 4, outputRepeat: true, inputArray: true},
 			{rl: 'custom1', raw: 'C1'},
 			{rl: 'custom2', raw: 'C2'},
 			{rl: 'custom3', raw: 'C3'},
@@ -154,45 +206,45 @@ export let translations = {
 			{rl: 'custom7', raw: 'C7'},
 			{rl: 'custom8', raw: 'C8'},
 			{rl: 'caption', raw: 'CA'},
-			{rl: 'caption', raw: 'CA'},
 			{rl: 'fallbackCity', raw: 'CY'},
 			{rl: 'date', raw: 'DA'},
 			{rl: 'database', raw: 'DB'},
 			{rl: 'doi', raw: 'DO'},
 			{rl: 'databaseProvider', raw: 'DP'},
-			{rl: '_pageEnd', raw: 'EP'},
-			{rl: 'edition', raw: 'ET'},
-			{rl: 'number', raw: 'IS'},
-			{rl: 'journal', raw: 'J1'},
-			{rl: 'journal', raw: 'JF'},
-			{rl: 'keywords', raw: 'KW', isArray: true},
-			{rl: 'urls', raw: 'L1', isArray: true},
-			{rl: 'urls', raw: 'L2', isArray: true},
-			{rl: 'urls', raw: 'L3', isArray: true},
-			{rl: 'urls', raw: 'L4', isArray: true},
+			{rl: '_pageEnd', raw: 'EP', sort: 6},
+			{rl: 'edition', raw: 'ET', sort: 7},
+			{rl: 'number', raw: 'IS', sort: 8},
+			{rl: 'journal', raw: 'J1', sort: false},
+			{rl: 'journal', raw: 'JF', sort: 3},
+			{rl: 'keywords', raw: 'KW', outputRepeat: true, inputArray: true},
+			{rl: 'urls', raw: 'L1', sort: false, inputArray: true},
+			{rl: 'urls', raw: 'L2', sort: false, inputArray: true},
+			{rl: 'urls', raw: 'L3', sort: false, inputArray: true},
+			{rl: 'urls', raw: 'L4', sort: false, inputArray: true},
 			{rl: 'language', raw: 'LA'},
 			{rl: 'label', raw: 'LB'},
-			{rl: 'urls', isArray: true, raw: 'LK'},
+			{rl: 'urls', raw: 'LK'},
 			{rl: 'notes', raw: 'N1'},
 			{rl: 'fallbackAbstract', raw: 'N2'},
 			{rl: 'publisher', raw: 'PB'},
 			{rl: 'year', raw: 'PY'},
 			{rl: 'isbn', raw: 'SN'},
-			{rl: '_pageStart', raw: 'SP'},
-			{rl: 'title', raw: 'T1'},
-			{rl: 'journal', raw: 'T2'},
-			{rl: 'title', raw: 'TI'},
-			{rl: 'type', raw: 'TY'},
-			{rl: 'urls', isArray: true, raw: 'UR'},
+			{rl: '_pageStart', raw: 'SP', sort: 5},
+			{rl: 'title', raw: 'T1', sort: false},
+			{rl: 'journal', raw: 'T2', sort: false},
+			{rl: 'title', raw: 'TI', sort: 1},
+			{rl: 'type', raw: 'TY', sort: 0}, // TY must be the lowest number
+			{rl: 'urls', raw: 'UR', outputRepeat: true, inputArray: true},
 			{rl: 'volume', raw: 'VL'},
 			{rl: 'date', raw: 'Y1'},
 			{rl: 'accessDate', raw: 'Y2'},
 
 			// These are non-standard fields but we keep these here anyway to prevent data loss
-			{rl: 'risID', raw: 'ID'},
-			{rl: 'risShortTitle', raw: 'ST'},
-			{rl: 'risOriginalPublication', raw: 'OP'},
+			{rl: 'RISID', raw: 'ID'},
+			{rl: 'RISShortTitle', raw: 'ST'},
+			{rl: 'RISOriginalPublication', raw: 'OP'},
 		],
+		collectionOutput: [], // Sorted + filtered version of the above to use when outputting
 		rawMap: new Map(), // Calculated later for quicker lookup
 		rlMap: new Map(), // Calculated later for quicker lookup
 	},
@@ -270,6 +322,14 @@ export let translations = {
 * @see modules/interface.js
 */
 export function setup() {
+	// Sort the field set by sort field
+	translations.fields.collectionOutput = translations.fields.collection
+		.filter(f => f.sort !== false)
+		.sort((a, b) => (a.sort ?? 1000) == (b.sort ?? 1000) ? 0
+			: (a.sort ?? 1000) < (b.sort ?? 1000) ? -1
+			: 1
+		)
+
 	// Create lookup object of translations.fields with key as .rl / val as the full object
 	translations.fields.collection.forEach(c => {
 		translations.fields.rlMap.set(c.rl, c);
@@ -281,4 +341,5 @@ export function setup() {
 		translations.types.rlMap.set(c.rl, c);
 		translations.types.rawMap.set(c.raw, c);
 	});
+
 }

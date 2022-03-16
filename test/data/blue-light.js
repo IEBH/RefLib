@@ -78,10 +78,12 @@ export function compareTestRefs(refs, options) {
 		let computedRef = refs.find(r => r.title == originalRef.title || r.recNumber == originalRef.recNumber);
 
 		expect(computedRef).to.be.an('object');
+		// console.log('Compare ref', {given: computedRef, wanted: originalRef});
 		Object.entries(originalRef).forEach(([key, val]) => {
 			if (settings.excludeKeys.has(key)) return; // Ignore key if excluded
 			expect(computedRef).to.have.property(key);
-			expect(computedRef[key]).to.deep.equal(val);
+			// console.log('CMP', key, {given: computedRef[key], wanted: val});
+			expect(computedRef[key]).to.deep.equal(val, `Expected key ${key} to match`);
 		});
 	});
 }

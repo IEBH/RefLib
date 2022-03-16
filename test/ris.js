@@ -39,7 +39,7 @@ describe('Module: ris', ()=> {
 	// }}}
 
 	// Write RIS file (via promise) {{{
-	it.skip('should write a RIS file #1 (via promise)', function() {
+	it('should write a RIS file #1 (via promise)', function() {
 		this.timeout(30 * 1000); //= 30s
 
 		let tempPath = temp.path({prefix: 'reflib-', suffix: '.ris'});
@@ -53,7 +53,7 @@ describe('Module: ris', ()=> {
 	// }}}
 
 	// Stream RIS file {{{
-	it.skip('should stream a RIS file', function() {
+	it('should stream a RIS file', function() {
 		this.timeout(30 * 1000); //= 30s
 
 		let tempPath = temp.path({prefix: 'reflib-', suffix: '.ris'});
@@ -74,7 +74,7 @@ describe('Module: ris', ()=> {
 	// }}}
 
 	// End-to-end test {{{
-	it.skip('should run a parse -> write -> parse test with all references', function() {
+	it('should run a parse -> write -> parse test with all references', function() {
 		this.timeout(60 * 1000); //= 1m
 
 		let tempPath = temp.path({prefix: 'reflib-', suffix: '.ris'});
@@ -93,9 +93,12 @@ describe('Module: ris', ()=> {
 			.then(()=> reflib.readFile(tempPath))
 			.then(newRefs => {
 				mlog.log('Comparing', newRefs.length, 'references');
-				newRefs.forEach((ref, refOffset) =>
-					expect(ref).to.deep.equal(originalRefs[refOffset])
-				);
+				newRefs.forEach((ref, refOffset) => {
+					Object.keys(originalRefs[refOffset]).forEach(key => {
+						expect(ref).to.have.property(key);
+						expect(ref[key]).to.deep.equal(originalRefs[refOffset][key]);
+					})
+				});
 			})
 	});
 	// }}}
