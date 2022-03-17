@@ -19,7 +19,7 @@ Compatibility
 | EndNote XML            | `.xml`          | :heavy_check_mark: | :heavy_check_mark: |
 | JSON                   | `.json`         | :heavy_check_mark: | :heavy_check_mark: |
 | Medline                | `.nbib`         | :x:                | :x:                |
-| RIS                    | `.ris` / `.txt` | :heavy_check_mark: | :x:                |
+| RIS                    | `.ris` / `.txt` | :heavy_check_mark: | :heavy_check_mark: |
 | Tab Separated Values   | `.tsv`          | :x:                | :x:                |
 
 
