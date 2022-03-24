@@ -24,7 +24,7 @@ export function readStream(stream, options) {
 				buffer += chunkBuffer.toString(); // Append incomming data to the partial-buffer we're holding in memory
 
 				let bufferCrop = 0; // How many bytes to shift off the front of the buffer based on the last full reference we saw, should end up at the last byte offset of buffer that is valid to shift-truncate to
-				let bufferSplitter = /[\r\n|\n]ER\s+-\s*[\r\n|\n]/g; // RegExp to use per segment (multiple calls to .exec() stores state because JS is a hellscape)
+				let bufferSplitter = /(\r\n|\n)ER\s+-\s*(\r\n|\n)/g; // RegExp to use per segment (multiple calls to .exec() stores state because JS is a hellscape)
 
 				let bufferSegment;
 				while (bufferSegment = bufferSplitter.exec(buffer)) {
