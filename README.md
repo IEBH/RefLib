@@ -23,6 +23,11 @@ Compatibility
 | Tab Separated Values   | `.tsv`          | :x:                | :x:                |
 
 
+**Notes on different formats**:
+
+* Medline seems to implement a totally different [publication type system](https://www.nlm.nih.gov/mesh/pubtypes.html) than others. RefLib will attempt to guess the best match, storing the original type in the `medlineType` key. Should the citation library be exported _back_ to Medline / `.nbib` files this key will take precedence to avoid data loss
+
+
 Reference Structure
 ===================
 RefLib creates a simple Plain-Old-JavaScript-Object (POJO) for each reference it parses, or writes to a file format when given a collection of the same.
