@@ -253,7 +253,7 @@ export let translations = {
 	types: {
 		collection: [
 			// Place high-priority translations at the top (when we translate BACK we need to know which of multiple keys to prioritize)
-			{rl: 'audiovisualMaterial', raw: 'ADVS'},
+			{rl: 'audioVisualMaterial', raw: 'ADVS'},
 			{rl: 'journalArticle', raw: 'JOUR'},
 			{rl: 'personalCommunication', raw: 'PCOMM'},
 			{rl: 'filmOrBroadcast', raw: 'VIDEO'},
@@ -304,8 +304,8 @@ export let translations = {
 			{rl: 'patent', raw: 'PAT'},
 			{rl: 'report', raw: 'RPRT'},
 			{rl: 'serial', raw: 'SER'},
-			{rl: 'audiovisualMaterial', raw: 'SLIDE'},
-			{rl: 'audiovisualMaterial', raw: 'SOUND'},
+			{rl: 'audioVisualMaterial', raw: 'SLIDE'},
+			{rl: 'audioVisualMaterial', raw: 'SOUND'},
 			{rl: 'standard', raw: 'STAND'},
 			{rl: 'statute', raw: 'STAT'},
 			{rl: 'thesis', raw: 'THES'},

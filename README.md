@@ -82,7 +82,7 @@ As with refs the following ref types are supported and translated from the modul
 aggregatedDatabase
 ancientText
 artwork
-audiovisualMaterial
+audioVisualMaterial
 bill
 blog
 book

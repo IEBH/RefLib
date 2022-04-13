@@ -342,7 +342,7 @@ export let translations = {
 			{rl: 'aggregatedDatabase', rawText: 'Aggregated Database', rawId: 55},
 			{rl: 'ancientText', rawText: 'Ancient Text', rawId: 51},
 			{rl: 'artwork', rawText: 'Artwork', rawId: 2},
-			{rl: 'audiovisualMaterial', rawText: 'Audiovisual Material', rawId: 3},
+			{rl: 'audioVisualMaterial', rawText: 'Audiovisual Material', rawId: 3},
 			{rl: 'bill', rawText: 'Bill', rawId: 4},
 			{rl: 'blog', rawText: 'Blog', rawId: 56},
 			{rl: 'book', rawText: 'Book', rawId: 6},
