@@ -287,12 +287,12 @@ export function xmlEscape(str) {
 */
 export function xmlUnescape(str) {
 	return ('' + str)
-		.replace(/\&amp;/g, '&')
-		.replace(/\&#xD;/g, '\r')
-		.replace(/\&lt;/g, '<')
-		.replace(/\&gt;/g, '>')
-		.replace(/\&quot;/g, '"')
-		.replace(/\&apos;/g, "'");
+		.replace(/&amp;/g, '&')
+		.replace(/&#xD;/g, '\r')
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
+		.replace(/&quot;/g, '"')
+		.replace(/&apos;/g, "'");
 }
 
 

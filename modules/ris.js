@@ -85,9 +85,8 @@ export function writeStream(stream, options) {
 				delete ref.pages;
 			}
 
-			let a ;
 			stream.write(
-				a = translations.fields.collectionOutput
+				translations.fields.collectionOutput
 					.filter(f => ref[f.rl]) // Has field?
 					.flatMap(f =>
 						f.rl == 'type' // Translate type field

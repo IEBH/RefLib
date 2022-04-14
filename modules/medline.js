@@ -47,14 +47,14 @@ export function readStream(stream, options) {
 		from: 'type',
 		to: 'type',
 		delete: false,
-		reformat: (v, ref) => translations.types.rawMap[v] || settings.defaultType,
+		reformat: v => translations.types.rawMap[v] || settings.defaultType,
 	});
 
 	// Reformat authors
 	settings.fieldsReplace.push({
 		to: 'authors',
 		reformat: (authors, ref) => (ref.medlineAuthorsShort || ref.medlineAuthorsFull || []).map(author =>
-			author.replace(/^(?<last>[\w\-]+?) (?<initials>\w+)$/, (match, last, initials) => {
+			author.replace(/^(?<last>[\w-]+?) (?<initials>\w+)$/, (match, last, initials) => {
 				return (
 					last && initials ? last + ', ' + initials.split('').map(i => `${i}.`).join(' ')
 					: last ? last
@@ -90,7 +90,7 @@ export function readStream(stream, options) {
 			from: 'medlineArticleID',
 			to: 'doi',
 			delete: false,
-			reformat: v => /(?<doi>[\w\.\/\_]+) \[doi\]/.exec(v)?.groups.doi || false,
+			reformat: v => /(?<doi>[\w\.\/_]+) \[doi\]/.exec(v)?.groups.doi || false,
 		});
 
 	// Allow parsing of years
@@ -187,7 +187,7 @@ export function writeStream(stream, options) {
 							? [
 								'TI  - ' + ref.title,
 								...(ref.authors || []).flatMap((a, i) => [
-									ref.medlineAuthorsFull?.[i] ? `FAU - ${ref.medlineAuthorsFull[i]}` : `FAU - ${authors[i]}`,
+									ref.medlineAuthorsFull?.[i] ? `FAU - ${ref.medlineAuthorsFull[i]}` : `FAU - ${ref.authors[i]}`,
 									ref.medlineAuthorsShort?.[i] && `AU  - ${ref.medlineAuthorsShort[i]}`,
 									ref.medlineAuthorsAffiliation?.[i] && `AD  - ${ref.medlineAuthorsAffiliation[i]}`,
 									ref.medlineAuthorsId?.[i] && `AUID- ${ref.medlineAuthorsId[i]}`,
