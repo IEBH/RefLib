@@ -7,7 +7,9 @@ import rollupNodePolyFill from 'rollup-plugin-node-polyfills';
 
 export default defineConfig({
 	plugins: [
-		babel(), // Config for babel in package.json
+		babel({ // Config for babel in package.json
+			babelHelpers: 'bundled', // We need to specify this here so Vite+Babel doesn't complain
+		}),
 		vue(),
 	],
 	resolve: {
