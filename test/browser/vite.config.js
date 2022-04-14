@@ -25,6 +25,7 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: {
+			// reflib: '../..', // FIXME: Vite doesn't support relative path resolution yet, when it does uncomment + correct import in `src/components/reflibTest.vue`
 			util: 'rollup-plugin-node-polyfills/polyfills/util.js', // Needed to monkey patch util.inherits into BFJ
 		},
 	},
