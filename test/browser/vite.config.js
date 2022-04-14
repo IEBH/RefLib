@@ -12,7 +12,8 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: {
-			// reflib: '../..', // FIXME: Vite doesn't support relative path resolution yet, when it does uncomment + correct import in `src/components/reflibTest.vue`
+			// KLUDGE: Absolutely horrible way to patch Reflib in using the relative path of src/components
+			reflib: '../../../../lib/browser.js',
 		},
 	},
 	optimizeDeps: {

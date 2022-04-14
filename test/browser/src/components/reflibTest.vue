@@ -1,6 +1,5 @@
 <script>
-// KLUDGE: Its annoying that we can't put this in vite.config#resolve.alias as Vite doesn't seem to support relative path resolution yet - MC 2022-04-14
-import reflib from '../../../../lib/browser.js';
+import reflib from 'reflib';
 
 export default {
 	data() { return {
