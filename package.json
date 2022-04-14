@@ -47,5 +47,17 @@
     "JSONStream": "^1.3.5",
     "mitt": "^3.0.0",
     "vite-plugin-replace": "^0.1.1"
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "env": {
+      "browser": true,
+      "es2021": true,
+      "mocha": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 13,
+      "sourceType": "module"
+    }
   }
 }
