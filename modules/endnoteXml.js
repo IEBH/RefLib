@@ -1,6 +1,6 @@
 import camelCase from '../shared/camelCase.js';
 import Emitter from '../shared/emitter.js';
-import {WritableStream as XMLParser} from 'htmlparser2/lib/WritableStream.js';
+import {WritableStream as XMLParser} from 'htmlparser2/lib/WritableStream';
 
 
 /**
