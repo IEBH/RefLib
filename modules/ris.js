@@ -27,7 +27,7 @@ export function readStream(stream, options) {
 				let bufferSplitter = /(\r\n|\n)ER\s+-\s*(\r\n|\n)/g; // RegExp to use per segment (multiple calls to .exec() stores state because JS is a hellscape)
 
 				let bufferSegment;
-				while (bufferSegment = bufferSplitter.exec(buffer)) {
+				while (bufferSegment = bufferSplitter.exec(buffer)) { // eslint-disable-line no-cond-assign
 					let parsedRef = parseRef(buffer.substring(bufferCrop, bufferSegment.index), settings); // Parse the ref from the start+end points
 
 					emitter.emit('ref', parsedRef);

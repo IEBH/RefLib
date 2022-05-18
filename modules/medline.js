@@ -90,7 +90,7 @@ export function readStream(stream, options) {
 			from: 'medlineArticleID',
 			to: 'doi',
 			delete: false,
-			reformat: v => /(?<doi>[\w\.\/_]+) \[doi\]/.exec(v)?.groups.doi || false,
+			reformat: v => /(?<doi>[\w\.\/_]+) \[doi\]/.exec(v)?.groups.doi || false, // eslint-disable-line no-useless-escape
 		});
 
 	// Allow parsing of years
@@ -128,7 +128,8 @@ export function readStream(stream, options) {
 				let bufferSplitter = /(\r\n|\n){2,}/g; // RegExp to use per segment (multiple calls to .exec() stores state because JS is a hellscape)
 
 				let bufferSegment;
-				while (bufferSegment = bufferSplitter.exec(buffer)) {
+
+				while (bufferSegment = bufferSplitter.exec(buffer)) { // eslint-disable-line no-cond-assign
 					let parsedRef = parseRef(buffer.substring(bufferCrop, bufferSegment.index), settings); // Parse the ref from the start+end points
 					emitter.emit('ref', parsedRef);
 
@@ -224,7 +225,6 @@ export function writeStream(stream, options) {
 export function parseRef(refString, settings) {
 	let ref = {}; // Reference under construction
 	let lastField; // Last field object we saw, used to append values if they don't match the default RIS key=val one-liner
-	let didWrap = false; // Whether the input was taken over multiple lines - if so obey `trimDotSuffix` before accepting
 
 	refString
 		.split(/[\r\n|\n]/) // Split into lines
@@ -237,7 +237,6 @@ export function parseRef(refString, settings) {
 					if (lastField.inputArray) { // Treat each line feed like an array entry
 						ref[lastField.rl].push(line);
 					} else { // Assume we append each line entry as a single-line string
-						didWrap = true;
 						ref[lastField.rl] += ' ' + line;
 					}
 				}
@@ -246,10 +245,8 @@ export function parseRef(refString, settings) {
 
 			let fieldLookup = translations.fields.rawMap.get(parsedLine.key);
 
-			if (lastField?.trimDotSuffix) {
+			if (lastField?.trimDotSuffix)
 				ref[lastField.rl] = ref[lastField.rl].replace(/\.$/, '');
-				didWrap = false;
-			}
 
 			if (!fieldLookup) { // Skip unknown field translations
 				lastField = null;
@@ -286,6 +283,7 @@ export function parseRef(refString, settings) {
 			if (replacement.from && (replacement.delete ?? true))
 				delete ref[replacement.from];
 		})
+	// }}}
 
 	return ref;
 }
