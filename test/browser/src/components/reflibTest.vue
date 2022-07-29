@@ -1,5 +1,5 @@
 <script>
-import reflib from 'reflib';
+import reflib from '@iebh/reflib';
 
 export default {
 	data() { return {

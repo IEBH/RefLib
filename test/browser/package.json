@@ -34,6 +34,7 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
     "@esbuild-plugins/node-modules-polyfill": "^0.1.4",
     "@fortawesome/fontawesome-free": "^6.1.1",
+    "@iebh/reflib": "file:../..",
     "@rollup/plugin-babel": "^5.3.1",
     "@vitejs/plugin-vue": "^2.3.1",
     "bootstrap": "^5.1.3",

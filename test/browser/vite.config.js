@@ -12,12 +12,6 @@ export default defineConfig({
 		}),
 		vue(),
 	],
-	resolve: {
-		alias: {
-			// KLUDGE: Absolutely horrible way to patch Reflib in using the relative path of src/components
-			reflib: '../../../../lib/browser.js',
-		},
-	},
 	optimizeDeps: {
         esbuildOptions: {
             define: {
