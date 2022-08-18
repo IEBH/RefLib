@@ -96,8 +96,12 @@ export function readStream(stream) {
 			},
 		})
 
-		stream.pipe(parser)
-			.on('finish', ()=> emitter.emit('end'))
+		console.log('PRE-PIPE STREAM IS', stream);
+		console.log('PRE-PIPE WRITABLE IS', parser);
+		console.log('FIXME: MC: parser isnt an instanceof WritableStream that the wrapper requires - but it is a browser level WritableStream');
+		debugger;
+		stream.pipeTo(parser)
+			.then(()=> emitter.emit('end'))
 	});
 
 	return emitter;
