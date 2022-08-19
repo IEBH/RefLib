@@ -112,10 +112,7 @@ export function readStream(stream) {
 			return;
 		}
 
-		/**
-		 * FIXME: CF: This is slow and clunky... but it works on frontend
-		 * We may want to consider moving to a DIY parser for speed and memory efficiency
-		 */
+		// TODO: CF: We may want to consider moving to a DIY parser for speed and memory efficiency
 		if (typeof stream.getReader === 'function') {
 			// We are on the browser
 			var reader = stream.getReader();
