@@ -1,7 +1,9 @@
 import camelCase from '../shared/camelCase.js';
 import Emitter from '../shared/emitter.js';
-import * as htmlparser2 from "htmlparser2";
 
+// TODO: CF: Don't need to import both, it depends if we are on browser or node
+import * as htmlparser2 from "htmlparser2";
+import {WritableStream as XMLParser} from 'htmlparser2/lib/WritableStream';
 
 /**
 * @see modules/interface.js
@@ -30,91 +32,112 @@ export function readStream(stream) {
 	*/
 	let textAppend = false;
 
+	/**
+	 * The options/callbacks for the parser
+	 * @type {Object}
+	 */
+	let parserOptions = {
+		xmlMode: true,
+		decodeEntities: false, // Handled below
+		onopentag(name, attrs) {
+			textAppend = false;
+			stack.push({
+				name: camelCase(name),
+				attrs,
+			});
+		},
+		onclosetag(name) {
+			if (name == 'record') {
+				if (ref.title) ref.title = ref.title // htmlparser2 handles the '<title>' tag in a really bizare way so we have to pull apart the <style> bits when parsing
+					.replace(/^.*<style.*>(.*)<\/style>.*$/m, '$1')
+					.replace(/^\s+/, '')
+					.replace(/\s+$/, '')
+				emitter.emit('ref', translateRawToRef(ref));
+				stack = []; // Trash entire stack when hitting end of <record/> node
+				ref = {}; // Reset the ref state
+			} else {
+				stack.pop();
+			}
+		},
+		ontext(text) {
+			let parentName = stack[stack.length - 1]?.name;
+			let gParentName = stack[stack.length - 2]?.name;
+			if (parentName == 'title') {
+				if (textAppend) {
+					ref.title += text;
+				} else {
+					ref.title = text;
+				}
+			} else if (parentName == 'style' && gParentName == 'author') {
+				if (!ref.authors) ref.authors = [];
+				if (textAppend) {
+					ref.authors[ref.authors.length - 1] += xmlUnescape(text);
+				} else {
+					ref.authors.push(xmlUnescape(text));
+				}
+			} else if (parentName == 'style' && gParentName == 'keyword') {
+				if (!ref.keywords) ref.keywords = [];
+				if (textAppend) {
+					ref.keywords[ref.keywords.length - 1] += xmlUnescape(text);
+				} else {
+					ref.keywords.push(xmlUnescape(text));
+				}
+			} else if (parentName == 'style') { // Text within <style/> tag
+				if (textAppend || ref[gParentName]) { // Text already exists? Append (handles node-expats silly multi-text per escape character "feature")
+					ref[gParentName] += xmlUnescape(text);
+				} else {
+					ref[gParentName] = xmlUnescape(text);
+				}
+			} else if (['recNumber', 'refType'].includes(parentName)) { // Simple setters like <rec-number/>
+				if (textAppend || ref[parentName]) {
+					ref[parentName] += xmlUnescape(text);
+				} else {
+					ref[parentName] = xmlUnescape(text);
+				}
+			}
+			textAppend = true; // Always set the next call to the text emitter handler as an append operation
+		},
+		onend() {
+			console.log("Successfully parsed file");
+			emitter.emit('end');
+		}
+	}
 
 	// Queue up the parser in the next tick (so we can return the emitter first)
 	setTimeout(() => {
-		let parser = new htmlparser2.Parser({
-			xmlMode: true,
-			decodeEntities: false, // Handled below
-			onopentag(name, attrs) {
-				textAppend = false;
-				stack.push({
-					name: camelCase(name),
-					attrs,
-				});
-			},
-			onclosetag(name) {
-				if (name == 'record') {
-					if (ref.title) ref.title = ref.title // htmlparser2 handles the '<title>' tag in a really bizare way so we have to pull apart the <style> bits when parsing
-						.replace(/^.*<style.*>(.*)<\/style>.*$/m, '$1')
-						.replace(/^\s+/, '')
-						.replace(/\s+$/, '')
-					emitter.emit('ref', translateRawToRef(ref));
-					stack = []; // Trash entire stack when hitting end of <record/> node
-					ref = {}; // Reset the ref state
-				} else {
-					stack.pop();
-				}
-			},
-			ontext(text) {
-				let parentName = stack[stack.length - 1]?.name;
-				let gParentName = stack[stack.length - 2]?.name;
-				if (parentName == 'title') {
-					if (textAppend) {
-						ref.title += text;
-					} else {
-						ref.title = text;
-					}
-				} else if (parentName == 'style' && gParentName == 'author') {
-					if (!ref.authors) ref.authors = [];
-					if (textAppend) {
-						ref.authors[ref.authors.length - 1] += xmlUnescape(text);
-					} else {
-						ref.authors.push(xmlUnescape(text));
-					}
-				} else if (parentName == 'style' && gParentName == 'keyword') {
-					if (!ref.keywords) ref.keywords = [];
-					if (textAppend) {
-						ref.keywords[ref.keywords.length - 1] += xmlUnescape(text);
-					} else {
-						ref.keywords.push(xmlUnescape(text));
-					}
-				} else if (parentName == 'style') { // Text within <style/> tag
-					if (textAppend || ref[gParentName]) { // Text already exists? Append (handles node-expats silly multi-text per escape character "feature")
-						ref[gParentName] += xmlUnescape(text);
-					} else {
-						ref[gParentName] = xmlUnescape(text);
-					}
-				} else if (['recNumber', 'refType'].includes(parentName)) { // Simple setters like <rec-number/>
-					if (textAppend || ref[parentName]) {
-						ref[parentName] += xmlUnescape(text);
-					} else {
-						ref[parentName] = xmlUnescape(text);
-					}
-				}
-				textAppend = true; // Always set the next call to the text emitter handler as an append operation
-			},
-			onend() {
-				console.log("Successfully parsed file");
-				emitter.emit('end');
-			}
-		})
-		// FIXME: CF: This is slow and clunky... but it works on frontend
-		// FIXME: CF: This also breaks the node.js implementation so writing our own xml parser is probably the way to go
-		var reader = stream.getReader();
-		var text = "";
-		function push() {
+
+		if (typeof stream.pipe === 'function') {
+			// We are on the node.js client
+			let parser = new XMLParser(parserOptions);
+			stream.pipe(parser)
+				.on('finish', ()=> emitter.emit('end'))
+		}
+
+		/**
+		 * FIXME: CF: This is slow and clunky... but it works on frontend
+		 * We may want to consider moving to a DIY parser for speed and memory efficiency
+		 */
+		//
+		if (typeof stream.getReader === 'function') {
+			// We are on the browser
+			var reader = stream.getReader();
+			var parser = new htmlparser2.Parser(parserOptions);
+			parseXMLOnBrowser();
+		}
+
+		function parseXMLOnBrowser() {
 			reader.read().then(({done, value}) => {
 				if (done) {
-					parser.write(text);
 					parser.end();
 				} else {
-					text += new TextDecoder().decode(value);
-					push();
+					var text = new TextDecoder().decode(value);
+					parser.write(text);
+					text = null; // Free up memory
+					parseXMLOnBrowser();
 				}
 			})
 		}
-		push();
+
 	})
 
 	return emitter;
