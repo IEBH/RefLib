@@ -98,7 +98,6 @@ export function readStream(stream) {
 			textAppend = true; // Always set the next call to the text emitter handler as an append operation
 		},
 		onend() {
-			console.log("Successfully parsed file");
 			emitter.emit('end');
 		}
 	}
@@ -110,19 +109,19 @@ export function readStream(stream) {
 			// We are on the node.js client
 			let parser = new XMLParser(parserOptions);
 			stream.pipe(parser)
-				.on('finish', ()=> emitter.emit('end'))
+			return;
 		}
 
 		/**
 		 * FIXME: CF: This is slow and clunky... but it works on frontend
 		 * We may want to consider moving to a DIY parser for speed and memory efficiency
 		 */
-		//
 		if (typeof stream.getReader === 'function') {
 			// We are on the browser
 			var reader = stream.getReader();
 			var parser = new htmlparser2.Parser(parserOptions);
 			parseXMLOnBrowser();
+			return;
 		}
 
 		function parseXMLOnBrowser() {
@@ -137,6 +136,8 @@ export function readStream(stream) {
 				}
 			})
 		}
+
+		console.error("This line should not be hit!");
 
 	})
 
