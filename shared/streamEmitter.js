@@ -1,6 +1,4 @@
 import Emitter from '../shared/emitter.js';
-import {ReadableWebToNodeStream} from 'readable-web-to-node-stream';
-import {Readable} from 'readable-stream';
 
 /**
 * Wrapper for streams which transforms a given input into an emitter pattern
@@ -17,28 +15,4 @@ export default function streamEmitter(inStream) {
 	//        inStream.pipeTo - a browser stream - passthru
 	//        !inStream.pipeTo - probably Node stream - need to glue pipeTo as a promiseable
 	return inStream;
-
-	if (inStream.on) return inStream; // inStream already supports event emitters - do nothing
-
-	let emitter = Emitter();
-	let utf8Decoder = new TextDecoder('utf-8');
-	let readCycle = ()=> {
-		inStream
-			.read()
-			.then(({value, done}) => {
-				if (done) {
-					emitter.emit('end');
-				} else {
-					emitter.emit('data', utf8Decoder.decode(value, {stream: true}));
-					setTimeout(readCycle); // Loop into next read if not already finished
-				}
-			})
-			.catch(e => emitter.emit('error', e))
-	};
-
-	// Keep downstream libraries happy by stubbing stream-like functions
-	emitter.setEncoding = ()=> {};
-
-	setTimeout(readCycle); // Queue up initial read cycle on next tick
-	return emitter;
 }

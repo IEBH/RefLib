@@ -1,6 +1,6 @@
 import camelCase from '../shared/camelCase.js';
 import Emitter from '../shared/emitter.js';
-import {WritableStream as XMLParser} from 'htmlparser2/lib/WritableStream';
+import * as htmlparser2 from "htmlparser2";
 
 
 /**
@@ -32,8 +32,8 @@ export function readStream(stream) {
 
 
 	// Queue up the parser in the next tick (so we can return the emitter first)
-	setTimeout(()=> {
-		let parser = new XMLParser({
+	setTimeout(() => {
+		let parser = new htmlparser2.Parser({
 			xmlMode: true,
 			decodeEntities: false, // Handled below
 			onopentag(name, attrs) {
@@ -94,15 +94,28 @@ export function readStream(stream) {
 				}
 				textAppend = true; // Always set the next call to the text emitter handler as an append operation
 			},
+			onend() {
+				console.log("Successfully parsed file");
+				emitter.emit('end');
+			}
 		})
-
-		console.log('PRE-PIPE STREAM IS', stream);
-		console.log('PRE-PIPE WRITABLE IS', parser);
-		console.log('FIXME: MC: parser isnt an instanceof WritableStream that the wrapper requires - but it is a browser level WritableStream');
-		debugger;
-		stream.pipeTo(parser)
-			.then(()=> emitter.emit('end'))
-	});
+		// FIXME: CF: This is slow and clunky... but it works on frontend
+		// FIXME: CF: This also breaks the node.js implementation so writing our own xml parser is probably the way to go
+		var reader = stream.getReader();
+		var text = "";
+		function push() {
+			reader.read().then(({done, value}) => {
+				if (done) {
+					parser.write(text);
+					parser.end();
+				} else {
+					text += new TextDecoder().decode(value);
+					push();
+				}
+			})
+		}
+		push();
+	})
 
 	return emitter;
 }
