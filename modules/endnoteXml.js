@@ -108,6 +108,7 @@ export function readStream(stream) {
 		if (typeof stream.pipe === 'function') {
 			// We are on the node.js client
 			let parser = new XMLParser(parserOptions);
+			stream.on('data', ()=> emitter.emit('progress', stream.bytesRead))
 			stream.pipe(parser)
 			return;
 		}

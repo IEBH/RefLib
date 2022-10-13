@@ -9,7 +9,8 @@ export function readStream(stream) {
 	let emitter = Emitter();
 
 	// Queue up the parser in the next tick (so we can return the emitter first)
-	setTimeout(()=>
+	setTimeout(()=> {
+		stream.on('data', ()=> emitter.emit('progress', stream.bytesRead));
 		stream.pipe(
 			JSONStream.parse('*')
 				.on('data', ref => emitter.emit('ref', {
@@ -19,7 +20,7 @@ export function readStream(stream) {
 				.on('end', ()=> emitter.emit('end'))
 				.on('error', emitter.emit.bind('error'))
 		)
-	);
+	});
 
 	return emitter;
 }

@@ -193,6 +193,19 @@ reflib.readFile('./data/json/json1.json')
 	.then(refs => /* Do something with Ref collection */)
 ```
 
+An emitter is available to track progress while reading. Note that due to the chainable nature of promises the first return contains the `emitter` key only:
+
+```javascript
+let reader = reflib.readFile('./data/json/json1.json');
+
+reader.emitter
+	.on('progress', ({readBytes, totalSize, refsFound}) => /* Report progress somehow */);
+	.on('end', ({refsFound}) => /* Report progress somehow */);
+
+reader
+	.then(refs => /* Do something with Ref collection */)
+```
+
 uploadFile(options)
 ===================
 Available: Browser
@@ -257,12 +270,3 @@ Credits
 =======
 Developed for the [Bond University Institute for Evidence-Based Healthcare](https://iebh.bond.edu.au).
 Please contact [the author](mailto:matt_carter@bond.edu.au) with any issues.
-
-
-TODO
-====
-- [x] Basic parsing iterfaces
-- [ ] "progress" emitter for files
-- [x] `.uploadFile()` browser compatibility
-- [ ] `.downloadFile()` browser compatibility
-- [x] `setup()` functions per module to avoid things like map calculations unless the module is actually needed

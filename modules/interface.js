@@ -14,6 +14,7 @@
 * @emits ref Emitted with a single ref object when found
 * @emits end Emitted when parsing has completed
 * @emits error Emitted when an error has been raised
+* @emits progress Emitted as (bytesRead) when reading a stream
 */
 export function readStream(stream, options) {
 	// Stub
