@@ -17,7 +17,10 @@
     "citations",
     "library"
   ],
-  "author": "Matt Carter <m@ttcarter.com>",
+  "author": [
+    "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang)",
+    "Connor Forbes <cforbes.software@gmail.com> (https://github.com/connorf25)"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/IEBH/RefLib/issues"
