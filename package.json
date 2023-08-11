@@ -1,6 +1,6 @@
 {
   "name": "@iebh/reflib",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Reference / Citation reference library utilities",
   "scripts": {
     "lint": "eslint lib modules shared test",
