@@ -3,6 +3,7 @@ import Emitter from '../shared/emitter.js';
 
 // TODO: CF: Don't need to import both, it depends if we are on browser or node
 import * as htmlparser2 from "htmlparser2";
+// FIXME: CF: Browsers freak out without pollyfills if this is imported
 import {WritableStream as XMLParser} from 'htmlparser2/lib/WritableStream';
 
 /**
