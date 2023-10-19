@@ -1,5 +1,4 @@
 import Emitter from '../shared/emitter.js';
-// FIXME: CF: Browsers freak out without pollyfills if this is imported
 import JSONStream from 'JSONStream';
 
 /**

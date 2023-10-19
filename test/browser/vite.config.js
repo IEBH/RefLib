@@ -1,9 +1,7 @@
 import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
 import {babel} from '@rollup/plugin-babel';
-import {NodeGlobalsPolyfillPlugin} from '@esbuild-plugins/node-globals-polyfill';
-import {NodeModulesPolyfillPlugin} from '@esbuild-plugins/node-modules-polyfill';
-import rollupNodePolyFill from 'rollup-plugin-node-polyfills';
+import {nodePolyfills} from 'vite-plugin-node-polyfills'
 
 export default defineConfig({
 	plugins: [
@@ -11,27 +9,25 @@ export default defineConfig({
 			babelHelpers: 'bundled', // We need to specify this here so Vite+Babel doesn't complain
 		}),
 		vue(),
+		nodePolyfills({
+			include: [
+				'stream',
+				'string_decoder',
+			],
+			exclude: [
+				'buffer',
+			],
+			globals: {
+				Buffer: true,
+				process: false,
+			},
+		}),
 	],
 	optimizeDeps: {
         esbuildOptions: {
             define: {
                 global: 'globalThis',
             },
-            plugins: [
-                NodeGlobalsPolyfillPlugin({
-                    buffer: true,
-                    process: false,
-                }),
-                NodeModulesPolyfillPlugin(),
-            ],
-        },
-    },
-    build: {
-        rollupOptions: {
-            plugins: [
-                // Enable rollup polyfills plugin - used during production bundling
-                rollupNodePolyFill(),
-            ],
         },
     },
 })

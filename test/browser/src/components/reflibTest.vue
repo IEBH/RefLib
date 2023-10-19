@@ -11,6 +11,8 @@ export default {
 	}},
 	methods: {
 		fileImport() {
+			let vm = this;
+
 			reflib.uploadFile({
 				onStart: ()=> {
 					this.mode = 'processing';
