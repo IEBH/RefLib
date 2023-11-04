@@ -39,6 +39,7 @@
     "./*": "./lib/*.js"
   },
   "devDependencies": {
+    "@momsfriendlydevco/eslint-config": "^1.0.9",
     "chai": "^4.3.10",
     "eslint": "^8.53.0",
     "mocha": "^10.2.0",
@@ -52,15 +53,14 @@
     "mitt": "^3.0.1"
   },
   "eslintConfig": {
-    "extends": "eslint:recommended",
+    "extends": "@momsfriendlydevco",
     "env": {
       "browser": true,
       "es2021": true,
       "mocha": true
     },
     "parserOptions": {
-      "ecmaVersion": 13,
-      "sourceType": "module"
+      "ecmaVersion": "latest"
     }
   }
 }
