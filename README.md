@@ -55,7 +55,7 @@ Each reference has the following standardized fields, these are translated from 
 | researchNotes    | `string`        |                                                                                        |
 | keywords         | `array<string>` | Optional list of keywords that apply to the reference                                  |
 | accessDate       | `string`        |                                                                                        |
-| accession        | `string`        |                                                                                        |
+| accession        | `string`        | [Accession numbers spec](https://support.nlm.nih.gov/knowledgebase/article/KA-03434/en-us), can sometimes be the PubMed ID |
 | doi              | `string`        |                                                                                        |
 | section          | `string`        |                                                                                        |
 | language         | `string`        |                                                                                        |

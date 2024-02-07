@@ -136,8 +136,6 @@ export function readStream(stream) {
 			})
 		}
 
-		console.error("This line should not be hit!");
-
 	})
 
 	return emitter;
@@ -215,6 +213,7 @@ export function writeStream(stream, options) {
 						['database', 'remote-database-name'],
 						['doi', 'electronic-resource-num'],
 						['isbn', 'isbn'],
+						['accessionNum', 'accession-num'],
 						['label', 'label'],
 						['language', 'language'],
 						['notes', 'notes'],
@@ -357,6 +356,7 @@ export let translations = {
 			{rl: 'volume', raw: 'volume'},
 			{rl: 'number', raw: 'number'},
 			{rl: 'isbn', raw: 'isbn'},
+			{rl: 'accessionNum', raw: 'accessionNum'},
 			{rl: 'abstract', raw: 'abstract'},
 			{rl: 'label', raw: 'label'},
 			{rl: 'caption', raw: 'caption'},
