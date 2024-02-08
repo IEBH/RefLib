@@ -29,6 +29,9 @@ export default {
 				.then(refs => this.refs = refs)
 				.then(()=> this.mode = 'done')
 		},
+		fileExport() {
+			return reflib.downloadFile(this.refs);
+		},
 	},
 }
 </script>
@@ -63,7 +66,8 @@ export default {
 			<div class="container px-4 text-center">
 				<h1 class="fw-bolder">RefLib Browser test</h1>
 				<p class="lead">Simple citation library read/write tests for the browser</p>
-				<a class="btn btn-lg btn-light" @click="fileImport()">Open citation file</a>
+				<a @click="fileImport()" class="btn btn-lg btn-light">Open citation file</a>
+				<a v-if="refs && refs.length > 0" @click="fileExport()" class="btn btn-lg btn-light ms-2">Export citation file...</a>
 				<p class="small mt-2">
 					Formats supported:
 					{{Object.values(formats)
