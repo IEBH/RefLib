@@ -10,7 +10,7 @@ import Emitter from '../shared/emitter.js';
 * @emits end Emitted as `()` when the input stream has closed
 * @emits error Emitted as `(Error)` on any read error
 */
-export default function streamEmitter(inStream) {
+export default function streamEmitter (inStream) {
 	if (inStream.getReader) { // Assume browser compatible ReadableStream
 		/**
 		* MC's tiny ReadableStream -> stream.Readable / Emitter pattern
@@ -21,6 +21,7 @@ export default function streamEmitter(inStream) {
 		*/
 		let reader = new Emitter();
 		Object.assign(reader, {
+			isBrowser: true, // Tells us we are in browser env
 			bytesRead: 0,
 			reader: inStream.getReader(),
 			textDecoder: new TextDecoder('utf-8'),

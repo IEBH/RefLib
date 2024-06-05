@@ -1,13 +1,12 @@
 import camelCase from '../shared/camelCase.js';
 import Emitter from '../shared/emitter.js';
 
-// TODO: CF: Don't need to import both, it depends if we are on browser or node
-import * as htmlparser2 from "htmlparser2";
 // FIXME: CF: Browsers freak out without pollyfills if this is imported
+// TODO: Find dynamic way to import as browsers no longer need this
 import {WritableStream as XMLParser} from 'htmlparser2/lib/WritableStream';
 
 /**
-* @see modules/interface.js
+* @see modules/inhterface.js
 */
 export function readStream(stream) {
 	let emitter = Emitter();
@@ -27,11 +26,61 @@ export function readStream(stream) {
 
 
 	/**
-	* Whether to append incomming text blocks to the previous block
+	* Whether to append incoming text blocks to the previous block
 	* This is necessary as XMLParser splits text into multiple calls so we need to know whether to append or treat this item as a continuation of the previous one
 	* @type {boolean}
 	*/
 	let textAppend = false;
+
+	class XMLParserBrowser {
+		constructor(passedParserOptions) {
+			// Stores XML in text form once read
+			this.text = "";
+			this.emitter = emitter;
+			// Add event listeners to mimic htmlparser2 behavior in the browser
+			this.emitter.on('opentag', passedParserOptions.onopentag);
+			this.emitter.on('closetag', passedParserOptions.onclosetag);
+			this.emitter.on('text', passedParserOptions.ontext);
+		}
+
+		write(data) {
+			this.text += data;
+		}
+
+		end() {
+			this.parseXML(this.text);
+			this.emitter.emit('end');
+		}
+
+		parseXML(xmlString) {
+			let parser = new DOMParser();
+			let doc = parser.parseFromString(xmlString, 'application/xml');
+			this.traverseNode(doc.documentElement);
+		}
+
+		traverseNode(node) {
+			if (node.nodeType === Node.ELEMENT_NODE) {
+				let name = camelCase(node.nodeName);
+				let attrs = Array.from(node.attributes).reduce((acc, attr) => {
+					acc[attr.name] = attr.value;
+					return acc;
+				}, {});
+
+				this.emitter.emit('opentag', name, attrs);
+
+				for (let child of node.childNodes) {
+					this.traverseNode(child);
+				}
+
+				this.emitter.emit('closetag', name);
+			} else if (node.nodeType === Node.TEXT_NODE) {
+				let text = node.nodeValue.trim();
+				if (text) {
+					this.emitter.emit('text', text);
+				}
+			}
+		}
+	}
 
 	/**
 	 * The options/callbacks for the parser
@@ -49,7 +98,7 @@ export function readStream(stream) {
 		},
 		onclosetag(name) {
 			if (name == 'record') {
-				if (ref.title) ref.title = ref.title // htmlparser2 handles the '<title>' tag in a really bizare way so we have to pull apart the <style> bits when parsing
+				if (ref.title) ref.title = ref.title // htmlparser2 handles the '<title>' tag in a really bizarre way so we have to pull apart the <style> bits when parsing
 					.replace(/^.*<style.*>(.*)<\/style>.*$/m, '$1')
 					.replace(/^\s+/, '')
 					.replace(/\s+$/, '')
@@ -106,34 +155,38 @@ export function readStream(stream) {
 	// Queue up the parser in the next tick (so we can return the emitter first)
 	setTimeout(() => {
 
-		if (typeof stream.pipe === 'function') {
+		// if (stream.isBrowser === true) {
+		// 	console.log('loading EndNote library as browser')
+		// 	// We are on the browser
+		// 	let reader = stream.getReader();
+		// 	// Add event listeners to mimic htmlparser2 behavior in the browser
+		// 	emitter.on('opentag', parserOptions.onopentag);
+		// 	emitter.on('closetag', parserOptions.onclosetag);
+		// 	emitter.on('text', parserOptions.ontext);
+		// 	parseXMLOnBrowser(reader);
+		// 	return;
+		// }
+
+		if (stream.isBrowser === true) {
 			// We are on the node.js client
+			console.log('Loading EndNote library as node.js')
+			let parser = new XMLParserBrowser(parserOptions);
+			stream.on('data', ()=> emitter.emit('progress', stream.bytesRead))
+			stream.pipe(parser)
+			return;
+		}
+
+		else if (typeof stream.pipe === 'function') {
+			// We are on the node.js client
+			console.log('Loading EndNote library as node.js')
 			let parser = new XMLParser(parserOptions);
 			stream.on('data', ()=> emitter.emit('progress', stream.bytesRead))
 			stream.pipe(parser)
 			return;
 		}
 
-		// TODO: CF: We may want to consider moving to a DIY parser for speed and memory efficiency
-		if (typeof stream.getReader === 'function') {
-			// We are on the browser
-			var reader = stream.getReader();
-			var parser = new htmlparser2.Parser(parserOptions);
-			parseXMLOnBrowser();
-			return;
-		}
-
-		function parseXMLOnBrowser() {
-			reader.read().then(({done, value}) => {
-				if (done) {
-					parser.end();
-				} else {
-					var text = new TextDecoder().decode(value);
-					parser.write(text);
-					text = null; // Free up memory
-					parseXMLOnBrowser();
-				}
-			})
+		else {
+			console.error('Error determining if on browser or node')
 		}
 
 	})
@@ -146,8 +199,8 @@ export function readStream(stream) {
 * @see modules/interface.js
 * @param {Object} [options] Additional options to use when parsing
 * @param {string} [options.defaultType='journalArticle'] Default citation type to assume when no other type is specified
-* @param {string} [options.filePath="c:\\"] "Fake" internal source file path the citation lirary was exported from, must end with backslashes
-* @param {string} [options.fileName="EndNote.enl"] "Fake" internal source file name the citation lirary was exported from
+* @param {string} [options.filePath="c:\\"] "Fake" internal source file path the citation library was exported from, must end with backslashes
+* @param {string} [options.fileName="EndNote.enl"] "Fake" internal source file name the citation library was exported from
 * @param {function} [options.formatDate] Date formatter to translate between a JS Date object and the EndNote YYYY-MM-DD format
 */
 export function writeStream(stream, options) {
@@ -409,7 +462,7 @@ export let translations = {
 			{rl: 'grant', rawText: 'Grant', rawId: 54},
 			{rl: 'hearing', rawText: 'Hearing', rawId: 14},
 			{rl: 'journalArticle', rawText: 'Journal Article', rawId: 17},
-			{rl: 'legalRuleOrRegulation', rawText:', Legal Rule or Regulation', rawId: 50},
+			{rl: 'legalRuleOrRegulation', rawText: 'Legal Rule or Regulation', rawId: 50},
 			{rl: 'magazineArticle', rawText: 'Magazine Article', rawId: 19},
 			{rl: 'manuscript', rawText: 'Manuscript', rawId: 36},
 			{rl: 'map', rawText: 'Map', rawId: 20},
