@@ -44,6 +44,7 @@ export function readStream(stream) {
 		}
 
 		write(data) {
+			// CF: TODO: Parse data as it comes in chunks for better memory efficiency
 			this.text += data;
 		}
 
