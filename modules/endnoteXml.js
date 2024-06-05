@@ -50,6 +50,8 @@ export function readStream(stream) {
 
 		end() {
 			this.parseXML(this.text);
+			// Free memory
+			this.text = ''
 			this.emitter.emit('end');
 		}
 

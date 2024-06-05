@@ -16,6 +16,8 @@ class BrowserJSONStream {
 		try {
 			// Parse this.text as JSON
 			const jsonArray = JSON.parse(this.text);
+			// Free memory
+			this.text = ''
 
 			// For each entry in the json array (as ref):
 			jsonArray.forEach(ref => {
