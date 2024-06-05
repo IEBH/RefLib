@@ -155,18 +155,6 @@ export function readStream(stream) {
 	// Queue up the parser in the next tick (so we can return the emitter first)
 	setTimeout(() => {
 
-		// if (stream.isBrowser === true) {
-		// 	console.log('loading EndNote library as browser')
-		// 	// We are on the browser
-		// 	let reader = stream.getReader();
-		// 	// Add event listeners to mimic htmlparser2 behavior in the browser
-		// 	emitter.on('opentag', parserOptions.onopentag);
-		// 	emitter.on('closetag', parserOptions.onclosetag);
-		// 	emitter.on('text', parserOptions.ontext);
-		// 	parseXMLOnBrowser(reader);
-		// 	return;
-		// }
-
 		if (stream.isBrowser === true) {
 			// We are on the node.js client
 			console.log('Loading EndNote library as node.js')
