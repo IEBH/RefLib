@@ -1,6 +1,6 @@
 {
   "name": "@iebh/reflib",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Reference / Citation reference library utilities",
   "scripts": {
     "lint": "eslint lib modules shared test",
@@ -40,6 +40,7 @@
   },
   "browser": {
     "htmlparser2/lib/WritableStream": false,
+    "htmlparser2/lib/esm/WritableStream": false,
     "JSONStream": false
   },
   "devDependencies": {
