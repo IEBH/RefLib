@@ -1,9 +1,19 @@
 import camelCase from '../shared/camelCase.js';
 import Emitter from '../shared/emitter.js';
 
-// FIXME: CF: Browsers freak out without pollyfills if this is imported
-// TODO: Find dynamic way to import as browsers no longer need this
-import {WritableStream as XMLParser} from 'htmlparser2/lib/WritableStream';
+// Only import WritableStream on node
+// This is needed even with the "browser" field of package.json
+let XMLParser;
+if (typeof window === 'undefined') {
+	// We are in node env
+	import('htmlparser2/lib/WritableStream').then(module => {
+		XMLParser = module.WritableStream;
+	});
+} else {
+	// Handle or ignore in browser environment
+	console.log("WritableStream not loaded in browser.");
+}
+
 
 /**
 * @see modules/inhterface.js

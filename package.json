@@ -17,8 +17,8 @@
     "citations",
     "library"
   ],
-  "author": [
-    "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang)",
+  "author": "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang)",
+  "contributors": [
     "Connor Forbes <cforbes.software@gmail.com> (https://github.com/connorf25)"
   ],
   "license": "MIT",
@@ -37,6 +37,10 @@
       "default": "./lib/default.js"
     },
     "./*": "./lib/*.js"
+  },
+  "browser": {
+    "htmlparser2/lib/WritableStream": false,
+    "JSONStream": false
   },
   "devDependencies": {
     "@momsfriendlydevco/eslint-config": "^1.0.9",
