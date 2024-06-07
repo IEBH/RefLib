@@ -25,6 +25,11 @@ export class WritableStream {
 		this.emitter.emit('end');
 	}
 
+	/**
+	 * TODO: The best approach for this is to use a custom XML parser that way the
+	 * file could also be parsed in chunks. This would be best achieved by using
+	 * REGEX expressions to parse.
+	 */
 	parseXML(xmlString) {
 		let parser = new DOMParser();
 		let doc = parser.parseFromString(xmlString, 'application/xml');
