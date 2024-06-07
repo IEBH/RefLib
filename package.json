@@ -1,6 +1,6 @@
 {
   "name": "@iebh/reflib",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Reference / Citation reference library utilities",
   "scripts": {
     "lint": "eslint lib modules shared test",
@@ -39,9 +39,9 @@
     "./*": "./lib/*.js"
   },
   "browser": {
-    "htmlparser2/lib/WritableStream": false,
-    "htmlparser2/lib/esm/WritableStream": false,
-    "JSONStream": false
+    "htmlparser2/lib/WritableStream": "./modules/shims/WritableStream-browser.js",
+    "htmlparser2/lib/esm/WritableStream": "./modules/shims/WritableStream-browser.js",
+    "JSONStream": "./modules/shims/JSONStream-browser.js"
   },
   "devDependencies": {
     "@momsfriendlydevco/eslint-config": "^1.0.9",

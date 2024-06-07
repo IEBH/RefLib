@@ -1,19 +1,8 @@
 import camelCase from '../shared/camelCase.js';
 import Emitter from '../shared/emitter.js';
 
-// Only import WritableStream on node
-// This is needed even with the "browser" field of package.json
-let XMLParser;
-if (typeof window === 'undefined') {
-	// We are in node env
-	import('htmlparser2/lib/WritableStream').then(module => {
-		XMLParser = module.WritableStream;
-	});
-} else {
-	// Handle or ignore in browser environment
-	console.log("WritableStream not loaded in browser.");
-}
-
+// This import is overwritten by the 'browser' field in package.json with the shimmed version
+import { WritableStream as XMLParser } from 'htmlparser2/lib/WritableStream';
 
 /**
 * @see modules/inhterface.js
@@ -41,59 +30,6 @@ export function readStream(stream) {
 	* @type {boolean}
 	*/
 	let textAppend = false;
-
-	class XMLParserBrowser {
-		constructor(passedParserOptions) {
-			// Stores XML in text form once read
-			this.text = "";
-			this.emitter = emitter;
-			// Add event listeners to mimic htmlparser2 behavior in the browser
-			this.emitter.on('opentag', passedParserOptions.onopentag);
-			this.emitter.on('closetag', passedParserOptions.onclosetag);
-			this.emitter.on('text', passedParserOptions.ontext);
-		}
-
-		write(data) {
-			// CF: TODO: Parse data as it comes in chunks for better memory efficiency
-			this.text += data;
-		}
-
-		end() {
-			this.parseXML(this.text);
-			// Free memory
-			this.text = ''
-			this.emitter.emit('end');
-		}
-
-		parseXML(xmlString) {
-			let parser = new DOMParser();
-			let doc = parser.parseFromString(xmlString, 'application/xml');
-			this.traverseNode(doc.documentElement);
-		}
-
-		traverseNode(node) {
-			if (node.nodeType === Node.ELEMENT_NODE) {
-				let name = camelCase(node.nodeName);
-				let attrs = Array.from(node.attributes).reduce((acc, attr) => {
-					acc[attr.name] = attr.value;
-					return acc;
-				}, {});
-
-				this.emitter.emit('opentag', name, attrs);
-
-				for (let child of node.childNodes) {
-					this.traverseNode(child);
-				}
-
-				this.emitter.emit('closetag', name);
-			} else if (node.nodeType === Node.TEXT_NODE) {
-				let text = node.nodeValue.trim();
-				if (text) {
-					this.emitter.emit('text', text);
-				}
-			}
-		}
-	}
 
 	/**
 	 * The options/callbacks for the parser
@@ -168,18 +104,7 @@ export function readStream(stream) {
 	// Queue up the parser in the next tick (so we can return the emitter first)
 	setTimeout(() => {
 
-		if (stream.isBrowser === true) {
-			// We are on the node.js client
-			console.log('Loading EndNote library as node.js')
-			let parser = new XMLParserBrowser(parserOptions);
-			stream.on('data', ()=> emitter.emit('progress', stream.bytesRead))
-			stream.pipe(parser)
-			return;
-		}
-
-		else if (typeof stream.pipe === 'function') {
-			// We are on the node.js client
-			console.log('Loading EndNote library as node.js')
+		if (typeof stream.pipe === 'function') {
 			let parser = new XMLParser(parserOptions);
 			stream.on('data', ()=> emitter.emit('progress', stream.bytesRead))
 			stream.pipe(parser)
@@ -187,7 +112,7 @@ export function readStream(stream) {
 		}
 
 		else {
-			console.error('Error determining if on browser or node')
+			console.error('Error with stream, check "streamEmitter.js" if on browser')
 		}
 
 	})

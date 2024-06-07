@@ -1,44 +1,6 @@
 import Emitter from '../shared/emitter.js';
+// This import is overwritten by the 'browser' field in package.json with the shimmed version
 import JSONStream from 'JSONStream';
-
-class BrowserJSONStream {
-	constructor() {
-			this.text = '';
-			this.emitter = Emitter();
-	}
-
-	write(data) {
-		// CF: TODO: Parse data as it comes in chunks for better memory efficiency
-		this.text += data
-	}
-
-	end() {
-		try {
-			// Parse this.text as JSON
-			const jsonArray = JSON.parse(this.text);
-			// Free memory
-			this.text = ''
-
-			// For each entry in the json array (as ref):
-			jsonArray.forEach(ref => {
-				this.emitter.emit('ref', {
-					recNumber: this.recNumber++,
-					...ref,
-				});
-			});
-
-			// Finished
-			this.emitter.emit('end');
-		} catch (e) {
-			console.error('Error parsing final JSON:', e);
-			this.emitter.emit('error', e);
-		}
-	}
-
-	on(event, listener) {
-		this.emitter.on(event, listener);
-	}
-}
 
 /**
 * @see modules/interface.js
@@ -51,34 +13,21 @@ export function readStream(stream) {
 	setTimeout(()=> {
 		stream.on('data', ()=> emitter.emit('progress', stream.bytesRead));
 
-		if (stream.isBrowser === true) {
-			// On browser
-			console.log('Parsing JSON natively in browser');
-			const browserJSONStream = new BrowserJSONStream();
-			browserJSONStream.on('ref', (data) => {
-					emitter.emit('ref', data);
-			});
-			browserJSONStream.on('end', () => emitter.emit('end'));
-			browserJSONStream.on('error', (error) => emitter.emit('error', error));
-			stream.pipe(browserJSONStream);
-	}
-
-		else if (typeof stream.pipe === 'function') {
+		if (typeof stream.pipe === 'function') {
 			// On node.js
 			console.log('Parsing JSON with node.js library')
 			const nodeJSONStream = JSONStream.parse('*')
-			nodeJSONStream
-			.on('data', ref => emitter.emit('ref', {
-				recNumber: recNumber++,
-				...ref,
-			}))
-			.on('end', ()=> emitter.emit('end'))
-			.on('error', emitter.emit.bind('error'));
+			nodeJSONStream.on('data', ref => emitter.emit('ref', {
+					recNumber: recNumber++,
+					...ref,
+				}))
+			nodeJSONStream.on('end', ()=> emitter.emit('end'))
+			nodeJSONStream.on('error', emitter.emit.bind('error'));
 			stream.pipe(nodeJSONStream)
 		}
 
 		else {
-			console.error('Error determining if on browser or node')
+			console.error('Error with stream, check "streamEmitter.js" if on browser')
 		}
 	});
 
