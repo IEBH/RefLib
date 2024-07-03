@@ -1,4 +1,3 @@
-import camelCase from '../../shared/camelCase.js';
 import Emitter from '../../shared/emitter.js';
 import CacxParser from '@iebh/cacx';
 
@@ -9,12 +8,12 @@ export class WritableStream {
 			collect: false,
 			onTagOpen: (node) => {
 				console.log(node.tag, node.attrs);
-				const name = camelCase(node.tag);
+				const name = node.tag;
 				const attrs = node.attrs || {};
 				this.emitter.emit('opentag', name, attrs);
 			},
 			onTagClose: (node) => {
-				const name = camelCase(node.tag);
+				const name = node.tag;
 				// Emit text event before closing the tag
 				if (node.text && node.text.trim()) {
 					this.emitter.emit('text', node.text.trim());

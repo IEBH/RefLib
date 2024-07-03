@@ -28,7 +28,7 @@ describe('Module: endnoteXml', ()=> {
 				expect(refs[0].authors).to.deep.equal(['Foo & Bar', 'Baz & Quz']);
 				expect(refs[0]).to.have.property('address', 'Foo & Bar');
 				expect(refs[0]).to.have.property('title', 'Foo & Bar');
-				expect(refs[0]).to.have.property('journal', 'Foo & Bar');
+				expect(refs[0]).to.have.property('journal', 'Foo & Journal');
 				expect(refs[0]).to.have.property('keywords');
 				expect(refs[0].keywords).to.deep.equal(['Foo & Bar', 'Baz & Quz']);
 			})
