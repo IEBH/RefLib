@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Vite Server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/test/browser",
+      "console": "integratedTerminal",
+      "env": {
+        "VITE_DEV_SERVER_URL": "http://localhost:3000"
+      }
+    },
+    {
+      "name": "Debug in Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "/__vite-root/*": "${webRoot}/*",
+        "/@fs/*": "*",
+        "/@vite-root/*": "${webRoot}/*",
+        "/src/*": "${webRoot}/src/*",
+        "/modules/*": "${webRoot}/modules/*"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Vite + Chrome",
+      "configurations": ["Debug Vite Server", "Debug in Chrome"]
+    }
+  ]
+}

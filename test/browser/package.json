@@ -4,6 +4,7 @@
   "description": "Reference / Citation reference library utilities - browser tests",
   "scripts": {
     "dev": "vite",
+    "debug": "node --inspect ./node_modules/.bin/vite",
     "build": "vite build",
     "preview": "vite preview"
   },
