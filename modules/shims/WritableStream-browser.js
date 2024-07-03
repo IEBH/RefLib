@@ -1,12 +1,32 @@
 import camelCase from '../../shared/camelCase.js';
 import Emitter from '../../shared/emitter.js';
+import CacxParser from '@iebh/cacx';
 
 export class WritableStream {
 	constructor(passedParserOptions) {
-		// Stores XML in text form once read
-		this.text = "";
 		this.emitter = Emitter();
-		// Add event listeners to mimic htmlparser2 behavior in the browser
+		this.parser = new CacxParser({
+			collect: false,
+			onTagOpen: (node) => {
+				console.log(node.tag, node.attrs);
+				const name = camelCase(node.tag);
+				const attrs = node.attrs || {};
+				this.emitter.emit('opentag', name, attrs);
+			},
+			onTagClose: (node) => {
+				const name = camelCase(node.tag);
+				// Emit text event before closing the tag
+				if (node.text && node.text.trim()) {
+					this.emitter.emit('text', node.text.trim());
+				}
+				this.emitter.emit('closetag', name);
+			},
+			flattenText: false,
+			keyText: 'text',
+			keyAttrs: 'attrs',
+		});
+
+		// Add event listeners to mimic htmlparser2 behavior
 		this.emitter.on('opentag', passedParserOptions.onopentag);
 		this.emitter.on('closetag', passedParserOptions.onclosetag);
 		this.emitter.on('text', passedParserOptions.ontext);
@@ -14,48 +34,20 @@ export class WritableStream {
 	}
 
 	write(data) {
-		// CF: TODO: Parse data as it comes in chunks for better memory efficiency
-		this.text += data;
+		this.parser.append(data).exec();
 	}
 
 	end() {
-		this.parseXML(this.text);
-		// Free memory
-		this.text = ''
-		this.emitter.emit('end');
-	}
+		// Process any remaining data
+		this.parser.exec();
 
-	/**
-	 * TODO: The best approach for this is to use a custom XML parser that way the
-	 * file could also be parsed in chunks. This would be best achieved by using
-	 * REGEX expressions to parse.
-	 */
-	parseXML(xmlString) {
-		let parser = new DOMParser();
-		let doc = parser.parseFromString(xmlString, 'application/xml');
-		this.traverseNode(doc.documentElement);
-	}
-
-	traverseNode(node) {
-		if (node.nodeType === Node.ELEMENT_NODE) {
-			let name = camelCase(node.nodeName);
-			let attrs = Array.from(node.attributes).reduce((acc, attr) => {
-				acc[attr.name] = attr.value;
-				return acc;
-			}, {});
-
-			this.emitter.emit('opentag', name, attrs);
-
-			for (let child of node.childNodes) {
-				this.traverseNode(child);
-			}
-
-			this.emitter.emit('closetag', name);
-		} else if (node.nodeType === Node.TEXT_NODE) {
-			let text = node.nodeValue.trim();
-			if (text) {
-				this.emitter.emit('text', text);
-			}
+		// Emit text event for the last node if it has text
+		const lastNode = this.parser.stack.at(-1);
+		if (lastNode && lastNode.text && lastNode.text.trim()) {
+			this.emitter.emit('text', lastNode.text.trim());
 		}
+
+		// Emit end event
+		this.emitter.emit('end');
 	}
 }
