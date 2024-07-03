@@ -6,8 +6,8 @@ export class WritableStream {
 		this.emitter = Emitter();
 		this.parser = new CacxParser({
 			collect: false,
+			reAttrSegment: /(?<key>[a-zA-Z_:][-a-zA-Z0-9_:.]*)(?:\s*=\s*(?<escape>["'])(?<val>.*?)\k<escape>)?/ig,
 			onTagOpen: (node) => {
-				console.log(node.tag, node.attrs);
 				const name = node.tag;
 				const attrs = node.attrs || {};
 				this.emitter.emit('opentag', name, attrs);
