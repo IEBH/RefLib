@@ -15,7 +15,6 @@ export function readStream(stream) {
 
 		if (typeof stream.pipe === 'function') {
 			// On node.js
-			console.log('Parsing JSON with node.js library')
 			const nodeJSONStream = JSONStream.parse('*')
 			nodeJSONStream.on('data', ref => emitter.emit('ref', {
 					recNumber: recNumber++,
