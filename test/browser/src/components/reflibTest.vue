@@ -41,7 +41,7 @@ export default {
 		<!-- Navigation -->
 		<nav id="mainNav" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
 			<div class="container px-4">
-				<a class="navbar-brand" href="#page-top">RefLib</a>
+				<a class="navbar-brand" href="#page-top">Reflib</a>
 				<button
 					class="navbar-toggler"
 					type="button"
@@ -55,7 +55,7 @@ export default {
 				</button>
 				<div id="navbarResponsive" class="collapse navbar-collapse">
 					<ul class="navbar-nav ms-auto">
-						<li class="nav-item"><a class="nav-link" href="https://github.com/IEBH/RefLib" target="_blank">GitHub</a></li>
+						<li class="nav-item"><a class="nav-link" href="https://github.com/IEBH/Reflib" target="_blank">GitHub</a></li>
 					</ul>
 				</div>
 			</div>
@@ -64,7 +64,7 @@ export default {
 		<!-- Header-->
 		<header class="bg-primary bg-gradient text-white">
 			<div class="container px-4 text-center">
-				<h1 class="fw-bolder">RefLib Browser test</h1>
+				<h1 class="fw-bolder">Reflib Browser test</h1>
 				<p class="lead">Simple citation library read/write tests for the browser</p>
 				<a @click="fileImport()" class="btn btn-lg btn-light">Open citation file</a>
 				<a v-if="refs && refs.length > 0" @click="fileExport()" class="btn btn-lg btn-light ms-2">Export citation file...</a>

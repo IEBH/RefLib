@@ -178,8 +178,8 @@ export function parseRef(refString, settings) {
 /**
 * Lookup tables for this module
 * @type {Object}
-* @property {array<Object>} fields Field translations between RefLib (`rl`) and the raw format (`raw`)
-* @property {array<Object>} types Field translations between RefLib (`rl`) and the raw format types as raw text (`rawText`) and numeric ID (`rawId`)
+* @property {array<Object>} fields Field translations between Reflib (`rl`) and the raw format (`raw`)
+* @property {array<Object>} types Field translations between Reflib (`rl`) and the raw format types as raw text (`rawText`) and numeric ID (`rawId`)
 * @property {boolean} isArray Whether the field should append to any existing `rl` field and be treated like an array of data
 * @property {number|boolean} [sort] Sort order when outputting, use boolean `false` to disable the field on output
 * @property {boolean} [outputRepeat=false] Whether to repeat the output field if multiple values are present, if disabled arrays are flattened into a string with newlines instead

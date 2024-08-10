@@ -264,9 +264,9 @@ export function writeStream(stream, options) {
 
 
 /**
-* Utility function to take the raw XML output object and translate it into a RefLib object
+* Utility function to take the raw XML output object and translate it into a Reflib object
 * @param {Object} xRef Raw XML object to process
-* @returns {Object} The translated RefLib object output
+* @returns {Object} The translated Reflib object output
 */
 export function translateRawToRef(xRef) {
 	let recOut = {
@@ -317,8 +317,8 @@ export function xmlUnescape(str) {
 /**
 * Lookup tables for this module
 * @type {Object}
-* @property {array<Object>} fields Field translations between RefLib (`rl`) and the raw format (`raw`)
-* @property {array<Object>} types Field translations between RefLib (`rl`) and the raw format types as raw text (`rawText`) and numeric ID (`rawId`)
+* @property {array<Object>} fields Field translations between Reflib (`rl`) and the raw format (`raw`)
+* @property {array<Object>} types Field translations between Reflib (`rl`) and the raw format types as raw text (`rawText`) and numeric ID (`rawId`)
 */
 export let translations = {
 	// Field translations {{{
