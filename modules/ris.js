@@ -195,7 +195,7 @@ export let translations = {
 			{rl: 'authors', raw: 'A4', sort: false, inputArray: true},
 			{rl: 'abstract', raw: 'AB'},
 			{rl: 'address', raw: 'AD'},
-			{rl: 'accession', raw: 'AN'},
+			{rl: 'accessionNum', raw: 'AN'},
 			{rl: 'authors', raw: 'AU', sort: 4, outputRepeat: true, inputArray: true},
 			{rl: 'custom1', raw: 'C1'},
 			{rl: 'custom2', raw: 'C2'},
