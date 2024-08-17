@@ -20,7 +20,7 @@ import Emitter from '../shared/emitter.js';
 * @param {string} [options.fieldsReplace.delete=true] Whether to remove the orignal 'from' field if successful (i.e. reformat doesn't return false)
 * @param {function} [options.fieldsReplace.reformat] Optional function called as `(value, ref)` to provide the new field value. If return value is boolean `false` no action is taken
 *
-* @returns {Object} A read stream analogue
+* @returns {Object} A readable stream analogue defined in `modules/interface.js`
 */
 export function readStream(stream, options) {
 	let settings = {
@@ -169,7 +169,7 @@ export function readStream(stream, options) {
 * @param {string} [options.defaultType='journalArticle'] Default citation type to assume when no other type is specified
 * @param {string} [options.delimeter='\r'] How to split multi-line items
 *
-* @returns {Object} A stream analogue
+* @returns {Object} A writable stream analogue defined in `modules/interface.js`
 */
 export function writeStream(stream, options) {
 	let settings = {

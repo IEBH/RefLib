@@ -8,7 +8,7 @@ import { WritableStream as XMLParser } from 'htmlparser2/lib/WritableStream';
 * Read an EndnoteXML file, returning a stream analogue
 * @see modules/inhterface.js
 * @param {Stream} stream Stream primative to encapsulate
-* @returns {Object} A readable stream analogue
+* @returns {Object} A readable stream analogue defined in `modules/interface.js`
 */
 export function readStream(stream) {
 	let emitter = Emitter();
@@ -130,7 +130,7 @@ export function readStream(stream) {
 * @param {string} [options.fileName="EndNote.enl"] "Fake" internal source file name the citation library was exported from
 * @param {function} [options.formatDate] Date formatter to translate between a JS Date object and the EndNote YYYY-MM-DD format
 *
-* @returns {Object} Streams analogue object
+* @returns {Object} A writable stream analogue defined in `modules/interface.js`
 */
 export function writeStream(stream, options) {
 	let settings = {

@@ -10,7 +10,7 @@ import Emitter from '../shared/emitter.js';
 * @param {string} [options.defaultType='report'] Default citation type to assume when no other type is specified
 * @param {string} [options.delimeter='\r'] How to split multi-line items
 *
-* @returns {Object} A stream analogue
+* @returns {Object} A readable stream analogue defined in `modules/interface.js`
 */
 export function readStream(stream, options) {
 	let settings = {
@@ -71,7 +71,7 @@ export function readStream(stream, options) {
 * @param {string} [options.defaultType='journalArticle'] Default citation type to assume when no other type is specified
 * @param {string} [options.delimeter='\r'] How to split multi-line items
 *
-* @returns {Object} A stream analogue
+* @returns {Object} A writable stream analogue defined in `modules/interface.js`
 */
 export function writeStream(stream, options) {
 	let settings = {
