@@ -58,7 +58,7 @@ export let testRefs = [
 * "Valid" data is specified in `testRefs` above and should be considered pristine data
 * @param {array<object>} refs Collection of input refs to compare against the known-correct data-set
 * @param {Object} [options] Additional options to use when comparing
-* @param {array<string>} Keys to exclude when comparing ref-to-ref
+* @param {Array<String>} [options.keys] Keys to exclude when comparing ref-to-ref
 * @param {string} [options.profile] Meta profile to set other options, see function for definitions
 */
 export function compareTestRefs(refs, options) {

@@ -1,10 +1,16 @@
 import Emitter from '../shared/emitter.js';
 
 /**
+* Parse a RIS file from a readable stream
+*
 * @see modules/interface.js
+*
+* @param {Stream} stream The readable stream to accept data from
 * @param {Object} [options] Additional options to use when parsing
 * @param {string} [options.defaultType='report'] Default citation type to assume when no other type is specified
 * @param {string} [options.delimeter='\r'] How to split multi-line items
+*
+* @returns {Object} A stream analogue
 */
 export function readStream(stream, options) {
 	let settings = {
@@ -28,7 +34,7 @@ export function readStream(stream, options) {
 				let bufferSplitter = /(\r\n|\n)ER\s+-\s*(\r\n|\n)/g; // RegExp to use per segment (multiple calls to .exec() stores state because JS is a hellscape)
 
 				let bufferSegment;
-				while (bufferSegment = bufferSplitter.exec(buffer)) { // eslint-disable-line no-cond-assign
+				while (bufferSegment = bufferSplitter.exec(buffer)) {
 					let parsedRef = parseRef(buffer.substring(bufferCrop, bufferSegment.index), settings); // Parse the ref from the start+end points
 
 					emitter.emit('ref', parsedRef);
@@ -55,10 +61,17 @@ export function readStream(stream, options) {
 
 
 /**
+* Write a RIS file to a writable stream
+*
 * @see modules/interface.js
+*
+* @param {Stream} stream The writable stream to write to
+*
 * @param {Object} [options] Additional options to use when parsing
 * @param {string} [options.defaultType='journalArticle'] Default citation type to assume when no other type is specified
 * @param {string} [options.delimeter='\r'] How to split multi-line items
+*
+* @returns {Object} A stream analogue
 */
 export function writeStream(stream, options) {
 	let settings = {
@@ -116,8 +129,10 @@ export function writeStream(stream, options) {
 /**
 * Parse a single RIS format reference from a block of text
 * This function is used internally by parseStream() for each individual reference
+*
 * @param {string} refString Raw RIS string composing the start -> end of the ref
 * @param {Object} settings Additional settings to pass, this should be initialized + parsed by the calling function for efficiency, see readStream() for full spec
+* @returns {ReflibRef} The parsed reference
 */
 export function parseRef(refString, settings) {
 	let ref = {}; // Reference under construction

@@ -3,7 +3,10 @@ import Emitter from '../shared/emitter.js';
 import JSONStream from 'JSONStream';
 
 /**
+* Read a JSON stream and emit references
 * @see modules/interface.js
+* @param {Stream} stream Stream primative to encapsulate
+* @returns {Object} A readable stream analogue
 */
 export function readStream(stream) {
 	let recNumber = 1;
@@ -35,9 +38,12 @@ export function readStream(stream) {
 
 
 /**
+* Write to a stream object
 * @see modules/interface.js
+* @param {Steam} [stream] The stream to write to
 * @param {Object} [options] Additional options to use when parsing
 * @param {string} [options.lineSuffix='\n'] Optional line suffix for each output line of JSON
+* @returns {Object} A writeable stream analogue
 */
 export function writeStream(stream, options) {
 	let settings = {

@@ -1,8 +1,9 @@
 /**
 * Camel case any input string
 * This is functionally the same as Lodash's camelCase() function
+*
 * @param {string} input The input string to camelize
-* @return {string} The input string in camelCase format
+* @returns {string} The input string in camelCase format
 * @url https://github.com/MomsFriendlyDevCo/Nodash
 */
 export default function(input) {

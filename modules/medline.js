@@ -1,7 +1,10 @@
 import Emitter from '../shared/emitter.js';
 
 /**
+* Read a Medline file as a stream
+*
 * @see modules/interface.js
+* @param {Stream} stream A readable stream analogue
 * @param {Object} [options] Additional options to use when parsing
 * @param {string} [options.defaultType='journalArticle'] Default citation type to assume when no other type is specified
 * @param {string} [options.delimeter='\r'] How to split multi-line items
@@ -16,6 +19,8 @@ import Emitter from '../shared/emitter.js';
 * @param {string} options.fieldsReplace.to Field to copy/move the value to
 * @param {string} [options.fieldsReplace.delete=true] Whether to remove the orignal 'from' field if successful (i.e. reformat doesn't return false)
 * @param {function} [options.fieldsReplace.reformat] Optional function called as `(value, ref)` to provide the new field value. If return value is boolean `false` no action is taken
+*
+* @returns {Object} A read stream analogue
 */
 export function readStream(stream, options) {
 	let settings = {
@@ -90,7 +95,7 @@ export function readStream(stream, options) {
 			from: 'medlineArticleID',
 			to: 'doi',
 			delete: false,
-			reformat: v => /(?<doi>[\w\.\/_]+) \[doi\]/.exec(v)?.groups.doi || false, // eslint-disable-line no-useless-escape
+			reformat: v => /(?<doi>[\w\.\/_]+) \[doi\]/.exec(v)?.groups.doi || false,
 		});
 
 	// Allow parsing of years
@@ -130,7 +135,7 @@ export function readStream(stream, options) {
 
 				let bufferSegment;
 
-				while (bufferSegment = bufferSplitter.exec(buffer)) { // eslint-disable-line no-cond-assign
+				while (bufferSegment = bufferSplitter.exec(buffer)) {
 					let parsedRef = parseRef(buffer.substring(bufferCrop, bufferSegment.index), settings); // Parse the ref from the start+end points
 					emitter.emit('ref', parsedRef);
 
@@ -156,10 +161,15 @@ export function readStream(stream, options) {
 
 
 /**
+* Write a Medline citation file to a stream
 * @see modules/interface.js
+*
+* @param {Stream} stream The stream to write to
 * @param {Object} [options] Additional options to use when parsing
 * @param {string} [options.defaultType='journalArticle'] Default citation type to assume when no other type is specified
 * @param {string} [options.delimeter='\r'] How to split multi-line items
+*
+* @returns {Object} A stream analogue
 */
 export function writeStream(stream, options) {
 	let settings = {
@@ -220,8 +230,11 @@ export function writeStream(stream, options) {
 /**
 * Parse a single RIS format reference from a block of text
 * This function is used internally by parseStream() for each individual reference
+*
 * @param {string} refString Raw RIS string composing the start -> end of the ref
 * @param {Object} settings Additional settings to pass, this should be initialized + parsed by the calling function for efficiency, see readStream() for full spec
+*
+* @returns {ReflibRef} A single reference, parsed form the incoming string
 */
 export function parseRef(refString, settings) {
 	let ref = {}; // Reference under construction

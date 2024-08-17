@@ -5,7 +5,10 @@ import Emitter from '../shared/emitter.js';
 import { WritableStream as XMLParser } from 'htmlparser2/lib/WritableStream';
 
 /**
+* Read an EndnoteXML file, returning a stream analogue
 * @see modules/inhterface.js
+* @param {Stream} stream Stream primative to encapsulate
+* @returns {Object} A readable stream analogue
 */
 export function readStream(stream) {
 	let emitter = Emitter();
@@ -103,18 +106,14 @@ export function readStream(stream) {
 
 	// Queue up the parser in the next tick (so we can return the emitter first)
 	setTimeout(() => {
-
 		if (typeof stream.pipe === 'function') {
 			let parser = new XMLParser(parserOptions);
 			stream.on('data', ()=> emitter.emit('progress', stream.bytesRead))
 			stream.pipe(parser)
 			return;
-		}
-
-		else {
+		} else {
 			console.error('Error with stream, check "streamEmitter.js" if on browser')
 		}
-
 	})
 
 	return emitter;
@@ -123,11 +122,15 @@ export function readStream(stream) {
 
 /**
 * @see modules/interface.js
+*
+* @param {Stream} stream Writable stream to output to
 * @param {Object} [options] Additional options to use when parsing
 * @param {string} [options.defaultType='journalArticle'] Default citation type to assume when no other type is specified
 * @param {string} [options.filePath="c:\\"] "Fake" internal source file path the citation library was exported from, must end with backslashes
 * @param {string} [options.fileName="EndNote.enl"] "Fake" internal source file name the citation library was exported from
 * @param {function} [options.formatDate] Date formatter to translate between a JS Date object and the EndNote YYYY-MM-DD format
+*
+* @returns {Object} Streams analogue object
 */
 export function writeStream(stream, options) {
 	let settings = {
