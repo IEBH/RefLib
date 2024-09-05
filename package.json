@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/IEBH/Reflib"
+    "url": "git+https://github.com/IEBH/Reflib.git"
   },
   "keywords": [
     "reflib",
