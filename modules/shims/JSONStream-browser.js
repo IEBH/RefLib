@@ -16,13 +16,15 @@ export default class BrowserJSONStream {
 		try {
 			// Parse this.text as JSON
 			const jsonArray = JSON.parse(this.text);
+
 			// Free memory
 			this.text = '';
 
 			// For each entry in the json array (as ref):
-			jsonArray.forEach(ref => {
-				this.emitter.emit('data', ref);
-			});
+			if (Array.isArray(jsonArray))
+				jsonArray.forEach(ref => {
+					this.emitter.emit('data', ref);
+				});
 
 			// Finished
 			this.emitter.emit('end');
