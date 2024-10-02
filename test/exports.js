@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {identifyFormat, formats, getModule, readFile, readStream, writeFile, writeStream} from '../lib/default.js';
+import {identifyFormat, formats, getModule, readFile, readStream, writeFile, writeStream,getRefDoi} from '../lib/default.js';
 
 describe('basic export tests', ()=> {
 
@@ -10,6 +10,7 @@ describe('basic export tests', ()=> {
 		expect(readStream).to.be.a('function');
 		expect(writeFile).to.be.a('function');
 		expect(writeStream).to.be.a('function');
+		expect(getRefDoi).to.be.a('function');
 	});
 
 	it('should correctly have exported objects', ()=> {
